@@ -134,6 +134,7 @@ public class ModStarterDebug extends LinearOpMode  {
             dashboardTelemetry.addData("intakeBack Power", intakeBackPower);
             dashboardTelemetry.addData("Flywhel vel", Flywheel.getVelocity());
             dashboardTelemetry.addData("Flywhel current", Flywheel.getCurrent(CurrentUnit.MILLIAMPS));
+            dashboardTelemetry.addLine("Aura of the letter T");
 
             dashboardTelemetry.addData("Fylwheel PIDF coeffs", Flywheel.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER));
 
