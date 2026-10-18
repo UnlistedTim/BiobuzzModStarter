@@ -37,7 +37,7 @@ public class ModStarterTeleop extends LinearOpMode  {
     private VoltageSensor voltageSensor;
 
 
-    public final double hoodCollapse = 0.38, hoodExtend = 0.28;
+    public final double hoodCollapse = 0.38, hoodExtend = 0.28, hoodShoot = 0.35;
 
     public final double blockClose = 0.63, blockOpen = 0.27;
 
@@ -113,15 +113,15 @@ public class ModStarterTeleop extends LinearOpMode  {
 
             switch (state){
                 case IDLE:
-                    intakeFront.setPower(0.8);
-                    intakeBack.setPower(0.6);
+                    intakeFront.setPower(0.9);
+                    intakeBack.setPower(0.4);
                     state = State.INTAKE;
                     break;
 
 
                 case INTAKE:
                     if (gamepad1.rightBumperWasPressed()){
-                        intakeFront.setPower(-0.8);
+                        intakeFront.setPower(-0.9);
                         stoptimers(0,intake);
                         Flywheel.setVelocity(shootVel);
                         state = State.TRANS;
@@ -132,7 +132,7 @@ public class ModStarterTeleop extends LinearOpMode  {
 
 
                 case TRANS:
-                    if (stoptimers(750, intake)){
+                    if (stoptimers(500, intake)){
                         intakeFront.setPower(0);
                         state = State.OUTTAKE;
 
@@ -145,10 +145,14 @@ public class ModStarterTeleop extends LinearOpMode  {
                     }
 
                     if (canShoot && Math.abs(Flywheel.getVelocity() - shootVel) <=40){
-
+                        intakeBack.setPower(0.6);
+                        Blocker.setPosition(blockOpen);
+                        shooting = true;
+                        canShoot = false;
+                        stoptimers(0,outtake);
                     }
 
-                    if (shooting && stoptimers(2000,outtake)){
+                    if (shooting && stoptimers(1000,outtake)){
                         Blocker.setPosition(blockClose);
                         shooting = false;
                         state = State.IDLE;
@@ -160,7 +164,7 @@ public class ModStarterTeleop extends LinearOpMode  {
 
             }
 
-            mecanumRobotCentricDrive(-gamepad1.right_stick_y, -gamepad1.right_stick_x, gamepad1.left_stick_x);
+            mecanumRobotCentricDrive(-gamepad1.right_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
 
 
 
@@ -186,7 +190,7 @@ public class ModStarterTeleop extends LinearOpMode  {
         runtime.reset();
 
         Blocker.setPosition(blockClose);
-        Hood.setPosition(hoodCollapse);
+        Hood.setPosition(hoodShoot);
 
     }
 
@@ -226,7 +230,7 @@ public class ModStarterTeleop extends LinearOpMode  {
 
         leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
         rightFront.setDirection(DcMotorSimple.Direction.FORWARD);
-        leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftBack.setDirection(DcMotorSimple.Direction.FORWARD);
         rightBack.setDirection(DcMotorSimple.Direction.FORWARD);
 
         intakeFront.setDirection(DcMotorSimple.Direction.FORWARD);
