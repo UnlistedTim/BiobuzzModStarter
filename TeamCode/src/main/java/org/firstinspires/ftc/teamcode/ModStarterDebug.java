@@ -51,7 +51,7 @@ public class ModStarterDebug extends LinearOpMode  {
     public static int flyVel  = 0;
 
 
-    public static double hoodPos = 0.38; // 0.28 90 degree up, 0.38 fully in
+    public static double hoodPos = 0.38; // 0.28 90 degree up, 0.39 fully in
 
     public static double blockerPos = 0.27; //0.27 up 0.63 collapse
 
