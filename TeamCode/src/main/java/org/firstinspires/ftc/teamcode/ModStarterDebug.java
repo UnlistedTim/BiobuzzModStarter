@@ -16,6 +16,7 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
@@ -74,6 +75,7 @@ public class ModStarterDebug extends LinearOpMode  {
     }
 
     private enum ShootState {
+
         START,PRE_SHOOT, UNLOCK,SHOOT, DONE
     }
     ShootState shootState = ShootState.START;
@@ -139,6 +141,8 @@ public class ModStarterDebug extends LinearOpMode  {
             dashboardTelemetry.addData("Fylwheel PIDF coeffs", Flywheel.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER));
 
             dashboardTelemetry.update();
+
+
 
 
 
