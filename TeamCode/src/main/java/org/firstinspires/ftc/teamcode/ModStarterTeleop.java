@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.math.Pose;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -18,6 +20,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.pedro.Constants;
+
 
 import java.util.List;
 
@@ -28,7 +32,7 @@ import java.util.List;
 
 public class ModStarterTeleop extends LinearOpMode  {
 
-    Pose2D pose,pose0;
+    Pose pose;
 
     private DcMotorEx intakeBack,intakeFront, Flywheel,  leftFront, rightFront, leftBack, rightBack;
 
@@ -43,10 +47,17 @@ public class ModStarterTeleop extends LinearOpMode  {
 
     public boolean shooting = false, canShoot = false;
 
+    public double X0,Y0,Xb0,Yb0,Xr0,Yr0;
+    public double posex,posey;
+
+
 
     public static double blockerPos = 0.27; //0.27 up 0.63 collapse
 
     public final int shootVel = 1180;
+    public Follower follower;
+
+
 
 
     public final PIDFCoefficients flyPIDVals = new PIDFCoefficients(10, 0, 0, 13);
@@ -172,9 +183,21 @@ public class ModStarterTeleop extends LinearOpMode  {
         }
     }
 
+    // C =PI/4+arctan (H/r);
+    // Vmin=squroot (g(H+squroot(H*H+r*r)
+
+    //
+
+    public void statusupdate(){
+    follower.update();
+    pose=follower.pose();
+
+
+    }
     public void initalize() {
         //  follower = Constants.createFollower(hardwareMap);
         Hw_init();
+
 //        rbg.init();
 //        getAutoVars();
 
@@ -208,7 +231,7 @@ public class ModStarterTeleop extends LinearOpMode  {
         leftBack = hardwareMap.get(DcMotorEx.class, "leftBack");
         rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
         Flywheel = hardwareMap.get(DcMotorEx.class, "Flywheel");
-
+        follower = Constants.create(hardwareMap);
 
         Hood = hardwareMap.get(Servo.class, "Hood");
         Blocker = hardwareMap.get(Servo.class, "Blocker");
