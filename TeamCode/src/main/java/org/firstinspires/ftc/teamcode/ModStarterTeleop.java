@@ -8,6 +8,7 @@ import com.pedropathing.api.PoseFactory;
 import com.pedropathing.math.Pose;
 
 
+import com.seattlesolvers.solverslib.controller.PIDController;
 import com.seattlesolvers.solverslib.util.InterpLUT;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -18,6 +19,8 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.seattlesolvers.solverslib.controller.PIDFController;
+
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
@@ -48,7 +51,12 @@ public class ModStarterTeleop extends LinearOpMode  {
 
     private VoltageSensor voltageSensor;
 
+    private PIDController drivePID = new PIDController(0.01,0,0.0008);
+
+
     InterpLUT Flylut = new InterpLUT();
+
+    double dist = 0;
 
 
     public final double flyp = 0.02, flyi=0, flyd = 0, flyv = 0.00036, flys = 0.04;
@@ -66,6 +74,8 @@ public class ModStarterTeleop extends LinearOpMode  {
     private final PoseFactory p = PoseFactory.degrees();
 
     public double targetX = -23+11, targetY = -70.6+55;
+
+    public double targetHeading = 0;
 
     private final Pose startPose = p.of(startX,startY,90);
 
@@ -92,7 +102,8 @@ public class ModStarterTeleop extends LinearOpMode  {
 
 
 
-    public final PIDFCoefficients flyPIDVals = new PIDFCoefficients(10, 0, 0, 13);
+
+
     double[] stoptime = new double[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     public final int intake = 0, outtake = 1;
@@ -151,7 +162,10 @@ public class ModStarterTeleop extends LinearOpMode  {
 //        Intake.setVelocity(rbg.intakeVel);
         telemetry.clearAll();
         while (opModeIsActive()) { //Main While loop
-            
+
+
+            statusupdate();
+
 
 
             switch (state){
@@ -167,6 +181,8 @@ public class ModStarterTeleop extends LinearOpMode  {
                         intakeFront.setPower(-0.9);
                         stoptimers(0,intake);
                         Flywheel.setVelocity(shootVel);
+
+
                         state = State.TRANS;
 
 
@@ -207,7 +223,6 @@ public class ModStarterTeleop extends LinearOpMode  {
 
             }
 
-            statusupdate();
 
             dashboardTelemetry.addData("Current X", pose.x());
             dashboardTelemetry.addData("Current Y", pose.y());
@@ -227,12 +242,52 @@ public class ModStarterTeleop extends LinearOpMode  {
 
     //
 
-    public void statusupdate(){
+    public void statusupdate(){ //TODO
     follower.update();
     pose=follower.pose();
-    flyCurrentVel = Flywheel.getVelocity();
-    Flywheel.setPower(flyPIDF(flyCurrentVel,targetFlyVel ));
+    targetHeading = Math.toDegrees(Math.atan2(targetPose.y() - pose.y(), targetPose.x() - pose.x()));
 
+    flyCurrentVel = Flywheel.getVelocity();
+    dist = pose.distance(targetPose);
+    targetFlyVel = Flylut.get(dist);
+    flywheel();
+
+
+
+    }
+
+    public double mecanumPID(double currentHeading, double targetHeading){
+        double error = ((targetHeading - currentHeading + 540) % 360) - 180;
+        return drivePID.calculate(error) - Math.signum(error) * 0.09;
+
+
+
+    }
+
+    public void autoAlign(){
+        double turn = mecanumPID(Math.toDegrees(pose.heading()),targetHeading );
+        if (!drivePID.atSetPoint()){
+            leftFront.setPower(turn);
+            leftBack.setPower(turn);
+            rightFront.setPower(-turn);
+            rightBack.setPower(-turn);
+        }
+        else{
+            leftFront.setPower(0);
+            leftBack.setPower(0);
+            rightFront.setPower(0);
+            rightBack.setPower(0);
+        }
+
+
+
+
+    }
+
+    public void flywheel(){
+
+        flyCurrentVel = Flywheel.getVelocity();
+        Flywheel.setPower(flyPIDF(flyCurrentVel,targetFlyVel ));
 
     }
     public void initalize() {

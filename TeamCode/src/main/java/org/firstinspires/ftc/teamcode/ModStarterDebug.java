@@ -13,6 +13,8 @@ import android.annotation.SuppressLint;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+
+
 //import com.pedropathing.geometry.Pose;
 //import com.pedropathing.paths.PathChain;
 
@@ -32,6 +34,7 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.seattlesolvers.solverslib.controller.PIDController;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
@@ -82,11 +85,18 @@ public class ModStarterDebug extends LinearOpMode  {
 
     private final PoseFactory p = PoseFactory.degrees();
 
-    public double targetX = -23+11, targetY = -70.6+55;
+    public static double targetX = -23+11, targetY = -70.6+55;
 
-    private final Pose startPose = p.of(startX,startY,90);
+    private Pose startPose = p.of(startX,startY,90);
 
-    private final Pose targetPose = p.of(targetX,targetY,90);
+    private Pose targetPose = p.of(targetX,targetY,90);
+
+    public double targetHeading = 0;
+
+    public static double targetHeadingPIDTest = 0;
+    public static double driveP = 0.01, driveI = 0, driveD = 0.0008, driveKs = 0.09;
+
+
 
 
 
@@ -114,6 +124,8 @@ public class ModStarterDebug extends LinearOpMode  {
     private ElapsedTime deltaT = new ElapsedTime();
     private ElapsedTime outtakeTimer = new ElapsedTime();
 
+    private PIDController drivePID = new PIDController(0,0,0);
+
 
 
     @SuppressLint("SuspiciousIndentation")
@@ -123,6 +135,7 @@ public class ModStarterDebug extends LinearOpMode  {
 
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
         initalize();
+        drivePID.setTolerance(2);
 
 
 //        Pinpoint.setPosition(new Pose2D(DistanceUnit.INCH, startX, startY, AngleUnit.RADIANS, startHeading));
@@ -139,6 +152,16 @@ public class ModStarterDebug extends LinearOpMode  {
 //        Intake.setVelocity(rbg.intakeVel);
         telemetry.clearAll();
         while (opModeIsActive()) { //Main While loop
+
+            follower.update();
+            pose=follower.pose();
+
+            targetPose = new Pose(targetX,targetY, 90);
+
+            targetHeading = Math.toDegrees(Math.atan2(targetPose.y() - pose.y(), targetPose.x() - pose.x()));
+
+
+
 
 
 
@@ -157,8 +180,7 @@ public class ModStarterDebug extends LinearOpMode  {
             intakeFront.setPower(intakeFrontPower);
 
             intakeBack.setPower(intakeBackPower);
-            follower.update();
-            pose=follower.pose();
+
 
 
 
@@ -170,10 +192,35 @@ public class ModStarterDebug extends LinearOpMode  {
 
             dashboardTelemetry.addData("Current X", pose.x());
             dashboardTelemetry.addData("Current Y", pose.y());
-            dashboardTelemetry.addData("Current theta", pose.heading());
+            dashboardTelemetry.addData("Current theta", Math.toDegrees(pose.heading()));
             dashboardTelemetry.addData("distance", pose.distance(targetPose));
 
-            mecanumRobotCentricDrive(-gamepad1.right_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
+//            mecanumRobotCentricDrive(-gamepad1.right_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
+
+//            if (gamepad1.right_bumper){
+//                autoAlign();
+//            }
+            drivePID.setPID(driveP,driveI,driveD);
+
+            double turn =  mecanumPID(Math.toDegrees(pose.heading()),targetHeadingPIDTest);
+
+            dashboardTelemetry.addData("Turn power", turn);
+
+
+            if (!drivePID.atSetPoint()){
+                leftFront.setPower(turn);
+                leftBack.setPower(turn);
+                rightFront.setPower(-turn);
+                rightBack.setPower(-turn);
+
+            }
+            else{
+                leftFront.setPower(0);
+                leftBack.setPower(0);
+                rightFront.setPower(0);
+                rightBack.setPower(0);
+            }
+
 
 
             dashboardTelemetry.update();
@@ -356,6 +403,35 @@ public class ModStarterDebug extends LinearOpMode  {
 
 
         //  telemetry.update();
+    }
+
+    public double mecanumPID(double currentHeading, double targetHeading){
+        double error = ((targetHeading - currentHeading + 540) % 360) - 180;
+        dashboardTelemetry.addData("error",error);
+        return drivePID.calculate(error) - Math.signum(error) * driveKs;
+
+
+
+    }
+
+    public void autoAlign(){
+        double turn = mecanumPID(Math.toDegrees(pose.heading()),targetHeading );
+        if (!drivePID.atSetPoint()){
+            leftFront.setPower(-turn);
+            leftBack.setPower(-turn);
+            rightFront.setPower(turn);
+            rightBack.setPower(turn);
+        }
+        else{
+            leftFront.setPower(0);
+            leftBack.setPower(0);
+            rightFront.setPower(0);
+            rightBack.setPower(0);
+        }
+
+
+
+
     }
 
 
