@@ -6,6 +6,9 @@ import android.annotation.SuppressLint;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.api.PoseFactory;
 import com.pedropathing.math.Pose;
+
+
+import com.seattlesolvers.solverslib.util.InterpLUT;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 
@@ -45,6 +48,12 @@ public class ModStarterTeleop extends LinearOpMode  {
 
     private VoltageSensor voltageSensor;
 
+    InterpLUT Flylut = new InterpLUT();
+
+
+    public final double flyp = 0.02, flyi=0, flyd = 0, flyv = 0.00036, flys = 0.04;
+
+
 
     public final double hoodCollapse = 0.38, hoodExtend = 0.28, hoodShoot = 0.35;
 
@@ -76,6 +85,8 @@ public class ModStarterTeleop extends LinearOpMode  {
 
     public final int shootVel = 1180;
     public Follower follower;
+
+    public double flyCurrentVel = 0, targetFlyVel = 0;
 
 
 
@@ -219,13 +230,18 @@ public class ModStarterTeleop extends LinearOpMode  {
     public void statusupdate(){
     follower.update();
     pose=follower.pose();
+    flyCurrentVel = Flywheel.getVelocity();
+    Flywheel.setPower(flyPIDF(flyCurrentVel,targetFlyVel ));
 
 
     }
     public void initalize() {
 //        follower = Constants.createFollower(hardwareMap);
         Hw_init();
+        LUT_init();
         follower.setPose(startPose);
+
+
 
 
 //        rbg.init();
@@ -291,10 +307,7 @@ public class ModStarterTeleop extends LinearOpMode  {
 
 
         Flywheel.setDirection(DcMotorSimple.Direction.FORWARD);
-        Flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        Flywheel.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,flyPIDVals);
-
-        Flywheel.setVelocity(0);
+        Flywheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -309,6 +322,19 @@ public class ModStarterTeleop extends LinearOpMode  {
 
 
 
+    }
+
+    public void LUT_init(){
+//        Flylut.add( , flyVel8);
+//        Flylut.add(flyTy8 , flyVel8);
+//        Flylut.add(flyTy7,flyVel7);
+//        Flylut.add(flyTy6,flyVel6);
+//        //close:
+//        Flylut.add(flyTy5,flyVel5);
+//        Flylut.add(flyTy4, flyVel4);
+//        Flylut.add(flyTy3,flyVel3);
+//        Flylut.add(flyTy2,flyVel2);
+//        Flylut.add(flyTy1,flyVel1);
     }
 
 
@@ -386,6 +412,17 @@ public class ModStarterTeleop extends LinearOpMode  {
 
 
         //  telemetry.update();
+    }
+
+    public double flyPIDF(double currentVel, double targetVel){
+        double velError = targetVel-currentVel;
+        double pid = flyp * velError;
+        double ff = flyv * targetVel + Math.signum(velError) * flys;
+//        dashboardTelemetry.addData("Total power", pid+ff);
+//        dashboardTelemetry.addData("PID", pid);
+//        dashboardTelemetry.addData("FF", ff);
+
+        return pid + ff;
     }
 
 
