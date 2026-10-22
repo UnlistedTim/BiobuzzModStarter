@@ -2,8 +2,13 @@ package org.firstinspires.ftc.teamcode;
 
 import android.annotation.SuppressLint;
 
+
+import com.pedropathing.follower.Follower;
+import com.pedropathing.api.PoseFactory;
+import com.pedropathing.math.Pose;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+
 import com.pedropathing.follower.Follower;
 import com.pedropathing.math.Pose;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -47,7 +52,22 @@ public class ModStarterTeleop extends LinearOpMode  {
 
     public boolean shooting = false, canShoot = false;
 
-    public double X0,Y0,Xb0,Yb0,Xr0,Yr0;
+    public double startX = -16, startY = -67.3;
+
+    private final PoseFactory p = PoseFactory.degrees();
+
+    public double targetX = -23+11, targetY = -70.6+55;
+
+    private final Pose startPose = p.of(startX,startY,90);
+
+    private final Pose targetPose = p.of(targetX,targetY,90);
+
+
+
+
+    public double Xred = 58, Xb = Xred + 24;
+
+    public double Yback = 54, Yfront = Yback + 2*18;
     public double posex,posey;
 
 
@@ -56,6 +76,7 @@ public class ModStarterTeleop extends LinearOpMode  {
 
     public final int shootVel = 1180;
     public Follower follower;
+
 
 
 
@@ -125,7 +146,7 @@ public class ModStarterTeleop extends LinearOpMode  {
             switch (state){
                 case IDLE:
                     intakeFront.setPower(0.9);
-                    intakeBack.setPower(0.4);
+                    intakeBack.setPower(0.6);
                     state = State.INTAKE;
                     break;
 
@@ -175,6 +196,13 @@ public class ModStarterTeleop extends LinearOpMode  {
 
             }
 
+            statusupdate();
+
+            dashboardTelemetry.addData("Current X", pose.x());
+            dashboardTelemetry.addData("Current Y", pose.y());
+            dashboardTelemetry.addData("Current theta", pose.heading());
+            dashboardTelemetry.addData("distance", pose.distance(targetPose));
+
             mecanumRobotCentricDrive(-gamepad1.right_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
 
 
@@ -195,8 +223,10 @@ public class ModStarterTeleop extends LinearOpMode  {
 
     }
     public void initalize() {
-        //  follower = Constants.createFollower(hardwareMap);
+//        follower = Constants.createFollower(hardwareMap);
         Hw_init();
+        follower.setPose(startPose);
+
 
 //        rbg.init();
 //        getAutoVars();

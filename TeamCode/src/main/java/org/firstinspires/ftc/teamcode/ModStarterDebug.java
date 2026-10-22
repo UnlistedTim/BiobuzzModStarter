@@ -2,6 +2,9 @@ package org.firstinspires.ftc.teamcode;
 
 import android.annotation.SuppressLint;
 
+//distance, speed, hood
+//19.708,
+
 
 //0.105 hood
 //0.08 hood
@@ -12,6 +15,12 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 //import com.pedropathing.geometry.Pose;
 //import com.pedropathing.paths.PathChain;
+
+import com.pedropathing.api.PoseFactory;
+import com.pedropathing.math.Pose;
+import com.pedropathing.api.PoseFactory;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.math.Pose;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -27,6 +36,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.pedro.Constants;
 
 import java.util.List;
 
@@ -37,13 +47,14 @@ import java.util.List;
 
 public class ModStarterDebug extends LinearOpMode  {
 
-    Pose2D pose,pose0;
+    Pose pose;
+
 
     private DcMotorEx intakeBack,intakeFront, Flywheel,  leftFront, rightFront, leftBack, rightBack;
 
-    private Servo Hood, Blocker;
+    private Servo Hood, Blocker, Flipper;
 
-    public static double flyp = 10, flyi=0, flyd = 0, flyf = 13;
+    public static double flyp = 0.02, flyi=0, flyd = 0, flyv = 0.00036, flys = 0.04;
 
     private VoltageSensor voltageSensor;
 
@@ -51,15 +62,31 @@ public class ModStarterDebug extends LinearOpMode  {
 
     public static int flyVel  = 0;
 
+    public double flyCurrentVel = 0;
+
 
     public static double hoodPos = 0.38; // 0.28 90 degree up, 0.39 fully in
 
     public static double blockerPos = 0.27; //0.27 up 0.63 collapse
 
+    public static double flipperPos = 0;
+
+    public Follower follower;
+
     FtcDashboard dashboard = FtcDashboard.getInstance();
 
 
     Telemetry dashboardTelemetry = dashboard.getTelemetry();
+
+    public double startX = -16, startY = -67.3;
+
+    private final PoseFactory p = PoseFactory.degrees();
+
+    public double targetX = -23+11, targetY = -70.6+55;
+
+    private final Pose startPose = p.of(startX,startY,90);
+
+    private final Pose targetPose = p.of(targetX,targetY,90);
 
 
 
@@ -114,31 +141,40 @@ public class ModStarterDebug extends LinearOpMode  {
         while (opModeIsActive()) { //Main While loop
 
 
-            Flywheel.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,new PIDFCoefficients(flyp,flyi,flyd,flyf));
 
 
-            Flywheel.setVelocity(flyVel);
+
+
+            flyCurrentVel = Flywheel.getVelocity();
+            Flywheel.setPower(flyPIDF(flyCurrentVel, flyVel));
 
             Hood.setPosition(hoodPos);
+
+//            Flipper.setPosition(flipperPos);
 
             Blocker.setPosition(blockerPos);
 
             intakeFront.setPower(intakeFrontPower);
 
             intakeBack.setPower(intakeBackPower);
+            follower.update();
+            pose=follower.pose();
 
 
 
-            dashboardTelemetry.addData("fly powers", flyVel);
-            dashboardTelemetry.addData("Hood pos", hoodPos);
-            dashboardTelemetry.addData("Blocker pos", blockerPos);
-            dashboardTelemetry.addData("intakeFront power", intakeFrontPower);
-            dashboardTelemetry.addData("intakeBack Power", intakeBackPower);
-            dashboardTelemetry.addData("Flywhel vel", Flywheel.getVelocity());
+
+
+
+            dashboardTelemetry.addData("Flywhel vel", flyCurrentVel);
             dashboardTelemetry.addData("Flywhel current", Flywheel.getCurrent(CurrentUnit.MILLIAMPS));
-            dashboardTelemetry.addLine("Aura of the letter T");
 
-            dashboardTelemetry.addData("Fylwheel PIDF coeffs", Flywheel.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER));
+            dashboardTelemetry.addData("Current X", pose.x());
+            dashboardTelemetry.addData("Current Y", pose.y());
+            dashboardTelemetry.addData("Current theta", pose.heading());
+            dashboardTelemetry.addData("distance", pose.distance(targetPose));
+
+            mecanumRobotCentricDrive(-gamepad1.right_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
+
 
             dashboardTelemetry.update();
 
@@ -151,8 +187,12 @@ public class ModStarterDebug extends LinearOpMode  {
     }
 
     public void initalize() {
-        //  follower = Constants.createFollower(hardwareMap);
+
         Hw_init();
+
+        follower = Constants.create(hardwareMap);
+
+        follower.setPose(startPose);
 //        rbg.init();
 //        getAutoVars();
 
@@ -178,8 +218,12 @@ public class ModStarterDebug extends LinearOpMode  {
         Flywheel = hardwareMap.get(DcMotorEx.class, "Flywheel");
 
 
+
+
+
         Hood = hardwareMap.get(Servo.class, "Hood");
         Blocker = hardwareMap.get(Servo.class, "Blocker");
+        Flipper = hardwareMap.get(Servo.class,"Flipper");
 
 //        Flywheel = hardwareMap.get(DcMotorEx.class, "Flywheel");
         intakeFront = hardwareMap.get(DcMotorEx.class,"intakeFront");
@@ -206,8 +250,8 @@ public class ModStarterDebug extends LinearOpMode  {
 
 
         Flywheel.setDirection(DcMotorSimple.Direction.FORWARD);
-        Flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        Flywheel.setVelocity(0);
+        Flywheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -224,6 +268,19 @@ public class ModStarterDebug extends LinearOpMode  {
 
 
     }
+
+    public double flyPIDF(double currentVel, double targetVel){
+        double velError = targetVel-currentVel;
+        double pid = flyp * velError;
+        double ff = flyv * targetVel + Math.signum(velError) * flys;
+        dashboardTelemetry.addData("Total power", pid+ff);
+        dashboardTelemetry.addData("PID", pid);
+        dashboardTelemetry.addData("FF", ff);
+
+        return pid + ff;
+    }
+
+
 
 
     public boolean stoptimers(double period, int i) {
