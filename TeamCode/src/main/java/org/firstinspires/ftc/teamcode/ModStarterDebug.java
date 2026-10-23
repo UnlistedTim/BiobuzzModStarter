@@ -3,7 +3,20 @@ package org.firstinspires.ftc.teamcode;
 import android.annotation.SuppressLint;
 
 //distance, speed, hood
-//19.708,
+
+//20.79, 1090, 0.315
+
+//38.23, 1120, 0.335
+
+//45.26, 1130, 0.345
+
+
+//56.61, 1180, 0.35
+
+
+
+
+
 
 
 //0.105 hood
@@ -57,7 +70,7 @@ public class ModStarterDebug extends LinearOpMode  {
 
     private Servo Hood, Blocker, Flipper;
 
-    public static double flyp = 0.02, flyi=0, flyd = 0, flyv = 0.00036, flys = 0.04;
+    public static double flyp = 0.012, flyi=0, flyd = 0, flyv = 0.00036, flys = 0.04;
 
     private VoltageSensor voltageSensor;
 
@@ -81,15 +94,15 @@ public class ModStarterDebug extends LinearOpMode  {
 
     Telemetry dashboardTelemetry = dashboard.getTelemetry();
 
-    public double startX = -16, startY = -67.3;
+    public double startX = -16.01, startY = -55.49;
 
     private final PoseFactory p = PoseFactory.degrees();
 
     public static double targetX = -23+11, targetY = -70.6+55;
 
-    private Pose startPose = p.of(startX,startY,90);
+    private Pose startPose = p.of(startX,startY,-90);
 
-    private Pose targetPose = p.of(targetX,targetY,90);
+    private Pose targetPose = p.of(targetX,targetY,-90);
 
     public double targetHeading = 0;
 
@@ -205,21 +218,21 @@ public class ModStarterDebug extends LinearOpMode  {
             double turn =  mecanumPID(Math.toDegrees(pose.heading()),targetHeadingPIDTest);
 
             dashboardTelemetry.addData("Turn power", turn);
-
-
-            if (!drivePID.atSetPoint()){
-                leftFront.setPower(turn);
-                leftBack.setPower(turn);
-                rightFront.setPower(-turn);
-                rightBack.setPower(-turn);
-
-            }
-            else{
-                leftFront.setPower(0);
-                leftBack.setPower(0);
-                rightFront.setPower(0);
-                rightBack.setPower(0);
-            }
+//
+//
+//            if (!drivePID.atSetPoint()){
+//                leftFront.setPower(turn);
+//                leftBack.setPower(turn);
+//                rightFront.setPower(-turn);
+//                rightBack.setPower(-turn);
+//
+//            }
+//            else{
+//                leftFront.setPower(0);
+//                leftBack.setPower(0);
+//                rightFront.setPower(0);
+//                rightBack.setPower(0);
+//            }
 
 
 
@@ -413,6 +426,8 @@ public class ModStarterDebug extends LinearOpMode  {
 
 
     }
+
+
 
     public void autoAlign(){
         double turn = mecanumPID(Math.toDegrees(pose.heading()),targetHeading );

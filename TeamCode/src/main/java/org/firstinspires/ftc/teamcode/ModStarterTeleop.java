@@ -13,24 +13,19 @@ import com.seattlesolvers.solverslib.util.InterpLUT;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 
-import com.pedropathing.follower.Follower;
-import com.pedropathing.math.Pose;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.seattlesolvers.solverslib.controller.PIDFController;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 
 
@@ -53,13 +48,19 @@ public class ModStarterTeleop extends LinearOpMode  {
 
     private PIDController drivePID = new PIDController(0.01,0,0.0008);
 
+    public final double driveKs = 0.09;
+
+    boolean rotating = false;
+
 
     InterpLUT Flylut = new InterpLUT();
+
+    InterpLUT Hoodlut = new InterpLUT();
 
     double dist = 0;
 
 
-    public final double flyp = 0.02, flyi=0, flyd = 0, flyv = 0.00036, flys = 0.04;
+    public final double flyp = 0.012, flyi=0, flyd = 0, flyv = 0.00036, flys = 0.04;
 
 
 
@@ -69,7 +70,7 @@ public class ModStarterTeleop extends LinearOpMode  {
 
     public boolean shooting = false, canShoot = false;
 
-    public double startX = -16, startY = -67.3;
+    public double startX = -16.01 , startY = -55.49;
 
     private final PoseFactory p = PoseFactory.degrees();
 
@@ -77,9 +78,9 @@ public class ModStarterTeleop extends LinearOpMode  {
 
     public double targetHeading = 0;
 
-    private final Pose startPose = p.of(startX,startY,90);
+    private final Pose startPose = p.of(startX,startY,-90);
 
-    private final Pose targetPose = p.of(targetX,targetY,90);
+    private final Pose targetPose = p.of(targetX,targetY,-90);
 
 
 
@@ -171,7 +172,7 @@ public class ModStarterTeleop extends LinearOpMode  {
             switch (state){
                 case IDLE:
                     intakeFront.setPower(0.9);
-                    intakeBack.setPower(0.6);
+                    intakeBack.setPower(0.5);
                     state = State.INTAKE;
                     break;
 
@@ -187,24 +188,39 @@ public class ModStarterTeleop extends LinearOpMode  {
 
 
                     }
+
                     break;
 
 
                 case TRANS:
+                    Shooter();
                     if (stoptimers(500, intake)){
                         intakeFront.setPower(0);
                         state = State.OUTTAKE;
 
                     }
+
+
                     break;
                 case OUTTAKE:
-                    if (gamepad1.rightBumperWasPressed()){
-                        canShoot = true;
+                    Shooter();
+                    if (gamepad1.rightBumperWasPressed() && !shooting && !rotating){
+                        canShoot = false;
+                        telemetry.addLine("Button pressed");
+                        telemetry.update();
+                        rotating = true;
 
                     }
 
-                    if (canShoot && Math.abs(Flywheel.getVelocity() - shootVel) <=40){
-                        intakeBack.setPower(0.6);
+                    if (rotating){
+
+                        autoAlign();
+
+                    }
+
+
+                    if (canShoot &&  !rotating && !shooting && Math.abs(flyCurrentVel - targetFlyVel) <40){
+                        intakeBack.setPower(0.5);
                         Blocker.setPosition(blockOpen);
                         shooting = true;
                         canShoot = false;
@@ -228,6 +244,7 @@ public class ModStarterTeleop extends LinearOpMode  {
             dashboardTelemetry.addData("Current Y", pose.y());
             dashboardTelemetry.addData("Current theta", pose.heading());
             dashboardTelemetry.addData("distance", pose.distance(targetPose));
+            dashboardTelemetry.update();
 
             mecanumRobotCentricDrive(-gamepad1.right_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
 
@@ -247,36 +264,33 @@ public class ModStarterTeleop extends LinearOpMode  {
     pose=follower.pose();
     targetHeading = Math.toDegrees(Math.atan2(targetPose.y() - pose.y(), targetPose.x() - pose.x()));
 
-    flyCurrentVel = Flywheel.getVelocity();
-    dist = pose.distance(targetPose);
-    targetFlyVel = Flylut.get(dist);
-    flywheel();
+
 
 
 
     }
 
-    public double mecanumPID(double currentHeading, double targetHeading){
-        double error = ((targetHeading - currentHeading + 540) % 360) - 180;
-        return drivePID.calculate(error) - Math.signum(error) * 0.09;
-
-
-
-    }
 
     public void autoAlign(){
-        double turn = mecanumPID(Math.toDegrees(pose.heading()),targetHeading );
-        if (!drivePID.atSetPoint()){
-            leftFront.setPower(turn);
-            leftBack.setPower(turn);
-            rightFront.setPower(-turn);
-            rightBack.setPower(-turn);
+        double turn = mecanumPID(Math.toDegrees(pose.heading())+180,targetHeading );
+
+        telemetry.addData("Pose angle", Math.toDegrees(pose.heading()));
+        telemetry.addData("Target angle", targetHeading);
+        telemetry.addData("Error gap",  targetHeading-Math.toDegrees(pose.heading()));
+        telemetry.update();
+        if (Math.abs(targetHeading-(Math.toDegrees(pose.heading()) - 180)) > 3 ){
+            leftFront.setPower(-turn);
+            leftBack.setPower(-turn);
+            rightFront.setPower(turn);
+            rightBack.setPower(turn);
         }
         else{
             leftFront.setPower(0);
             leftBack.setPower(0);
             rightFront.setPower(0);
             rightBack.setPower(0);
+            rotating = false;
+            canShoot = true;
         }
 
 
@@ -284,9 +298,29 @@ public class ModStarterTeleop extends LinearOpMode  {
 
     }
 
-    public void flywheel(){
+    public double mecanumPID(double currentHeading, double targetHeading){
+        currentHeading +=180;
+        double error;
+        if (currentHeading - targetHeading < 180){
+            error = targetHeading-currentHeading;
+        } else{
+            error = currentHeading-targetHeading;
+        }
+
+        dashboardTelemetry.addData("error",error);
+        return drivePID.calculate(error) - Math.signum(error) * driveKs;
+
+
+
+    }
+
+    public void Shooter(){
+
+        dist = pose.distance(targetPose);
+        targetFlyVel = flySpeed(dist);
 
         flyCurrentVel = Flywheel.getVelocity();
+        Hood.setPosition(flyHood(dist));
         Flywheel.setPower(flyPIDF(flyCurrentVel,targetFlyVel ));
 
     }
@@ -315,6 +349,7 @@ public class ModStarterTeleop extends LinearOpMode  {
 
         Blocker.setPosition(blockClose);
         Hood.setPosition(hoodShoot);
+
 
     }
 
@@ -380,16 +415,41 @@ public class ModStarterTeleop extends LinearOpMode  {
     }
 
     public void LUT_init(){
-//        Flylut.add( , flyVel8);
-//        Flylut.add(flyTy8 , flyVel8);
-//        Flylut.add(flyTy7,flyVel7);
-//        Flylut.add(flyTy6,flyVel6);
-//        //close:
-//        Flylut.add(flyTy5,flyVel5);
-//        Flylut.add(flyTy4, flyVel4);
-//        Flylut.add(flyTy3,flyVel3);
-//        Flylut.add(flyTy2,flyVel2);
-//        Flylut.add(flyTy1,flyVel1);
+
+        Flylut.add(0 , 1000); Hoodlut.add(0 , 0.3);
+        Flylut.add(20.79 , 1090); Hoodlut.add(20.79 , 0.315);
+        Flylut.add(38.23 , 1120); Hoodlut.add(38.23 , 0.335);
+        Flylut.add(45.26,1130); Hoodlut.add(45.26,0.345);
+        Flylut.add(56.61,1180); Hoodlut.add(56.61,0.35);
+        Flylut.add(200,1250); Hoodlut.add(200,0.37);
+
+        Flylut.createLUT();
+        Hoodlut.createLUT();
+
+    }
+
+    public double flyHood(double dist){
+        if (dist < 56.6 && dist > 20.7) {
+
+            return Hoodlut.get(dist);
+
+//            Tx_offset=0;
+
+        }
+        else return 0.34;//1500
+    }
+
+    public double flySpeed(double dist){
+        if (dist < 56.6 && dist > 20.7) {
+
+            return Flylut.get(dist);// Tx offset
+
+//            Tx_offset=0;
+
+        }
+        else return 1130;
+
+
     }
 
 
