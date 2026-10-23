@@ -8,6 +8,7 @@ import com.pedropathing.api.PoseFactory;
 import com.pedropathing.math.Pose;
 
 
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.seattlesolvers.solverslib.controller.PIDController;
 import com.seattlesolvers.solverslib.util.InterpLUT;
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -43,6 +44,8 @@ public class ModStarterTeleop extends LinearOpMode  {
     private DcMotorEx intakeBack,intakeFront, Flywheel,  leftFront, rightFront, leftBack, rightBack;
 
     private Servo Hood, Blocker;
+
+    private CRServo leftRoller, rightRoller;
 
     private VoltageSensor voltageSensor;
 
@@ -433,6 +436,9 @@ public class ModStarterTeleop extends LinearOpMode  {
         Flywheel = hardwareMap.get(DcMotorEx.class, "Flywheel");
         follower = Constants.create(hardwareMap);
 
+        leftRoller = hardwareMap.get(CRServo.class, "leftRoller");
+        rightRoller = hardwareMap.get(CRServo.class,"rightRoller");
+
         Hood = hardwareMap.get(Servo.class, "Hood");
         Blocker = hardwareMap.get(Servo.class, "Blocker");
 
@@ -458,6 +464,9 @@ public class ModStarterTeleop extends LinearOpMode  {
 
         intakeFront.setDirection(DcMotorSimple.Direction.FORWARD);
         intakeBack.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        leftRoller.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightRoller.setDirection(DcMotorSimple.Direction.FORWARD);
 
 
         Flywheel.setDirection(DcMotorSimple.Direction.FORWARD);

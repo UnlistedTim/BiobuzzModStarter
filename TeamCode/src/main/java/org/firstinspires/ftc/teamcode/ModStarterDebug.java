@@ -39,6 +39,7 @@ import com.pedropathing.math.Pose;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -69,6 +70,8 @@ public class ModStarterDebug extends LinearOpMode  {
     private DcMotorEx intakeBack,intakeFront, Flywheel,  leftFront, rightFront, leftBack, rightBack;
 
     private Servo Hood, Blocker, Flipper;
+
+    private CRServo leftRoller, rightRoller;
 
     public static double flyp = 0.012, flyi=0, flyd = 0, flyv = 0.00036, flys = 0.04;
 
@@ -105,6 +108,8 @@ public class ModStarterDebug extends LinearOpMode  {
     private Pose targetPose = p.of(targetX,targetY,-90);
 
     public double targetHeading = 0;
+
+    public static double leftRollerPower = 0, rightRollerPower = 0;
 
     public static double targetHeadingPIDTest = 0;
     public static double driveP = 0.01, driveI = 0, driveD = 0.0008, driveKs = 0.09;
@@ -193,6 +198,9 @@ public class ModStarterDebug extends LinearOpMode  {
             intakeFront.setPower(intakeFrontPower);
 
             intakeBack.setPower(intakeBackPower);
+
+            leftRoller.setPower(leftRollerPower);
+            rightRoller.setPower(rightRollerPower);
 
 
 
@@ -285,6 +293,9 @@ public class ModStarterDebug extends LinearOpMode  {
         Blocker = hardwareMap.get(Servo.class, "Blocker");
         Flipper = hardwareMap.get(Servo.class,"Flipper");
 
+        leftRoller = hardwareMap.get(CRServo.class, "leftRoller");
+        rightRoller = hardwareMap.get(CRServo.class,"rightRoller");
+
 //        Flywheel = hardwareMap.get(DcMotorEx.class, "Flywheel");
         intakeFront = hardwareMap.get(DcMotorEx.class,"intakeFront");
         intakeBack = hardwareMap.get(DcMotorEx.class,"intakeBack");
@@ -311,6 +322,9 @@ public class ModStarterDebug extends LinearOpMode  {
 
         Flywheel.setDirection(DcMotorSimple.Direction.FORWARD);
         Flywheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        leftRoller.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightRoller.setDirection(DcMotorSimple.Direction.FORWARD);
 
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
