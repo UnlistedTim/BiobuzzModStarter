@@ -46,7 +46,8 @@ public class ModStarterTeleop extends LinearOpMode  {
 
     private VoltageSensor voltageSensor;
 
-    private PIDController drivePID = new PIDController(0.01,0,0.0008);
+    private PIDController drivePID = new PIDController(0.02,0,0.0008);
+ //   private PIDController drivePID = new PIDController(0.01,0,0.0008);
 
     public final double driveKs = 0.09;
 
@@ -76,7 +77,7 @@ public class ModStarterTeleop extends LinearOpMode  {
 
     public double targetX = -23+11, targetY = -70.6+55;
 
-    public double targetHeading = 0;
+    public double targetHeading = 0,currentHeading=0;
 
     private final Pose startPose = p.of(startX,startY,-90);
 
@@ -98,6 +99,7 @@ public class ModStarterTeleop extends LinearOpMode  {
     public Follower follower;
 
     public double flyCurrentVel = 0, targetFlyVel = 0;
+    public boolean outtakePhase=false,timer=false;
 
 
 
@@ -165,12 +167,14 @@ public class ModStarterTeleop extends LinearOpMode  {
         while (opModeIsActive()) { //Main While loop
 
 
-            statusupdate();
+           if(outtakePhase) statusupdate();
+           if(timer) timer=!timeraction();
 
 
 
             switch (state){
                 case IDLE:
+                    outtakePhase=false;
                     intakeFront.setPower(0.9);
                     intakeBack.setPower(0.5);
                     state = State.INTAKE;
@@ -178,43 +182,49 @@ public class ModStarterTeleop extends LinearOpMode  {
 
 
                 case INTAKE:
-                    if (gamepad1.rightBumperWasPressed()){
+                    if (gamepad2.rightBumperWasPressed()){
                         intakeFront.setPower(-0.9);
                         stoptimers(0,intake);
+                        timer=true;
                         Flywheel.setVelocity(shootVel);
-
-
-                        state = State.TRANS;
-
-
+                        outtakePhase=true;
+                        state=State.OUTTAKE;
                     }
+
+
 
                     break;
 
 
-                case TRANS:
-                    Shooter();
-                    if (stoptimers(500, intake)){
-                        intakeFront.setPower(0);
-                        state = State.OUTTAKE;
-
-                    }
-
-
-                    break;
+//                case TRANS:
+//
+//                    if (!intakeDone&& stoptimers(500, intake)){
+//                        intakeFront.setPower(0);
+//                        intakeDone=true;
+//                    }
+//
+//                    if (rotating||gamepad2.rightBumperWasPressed()){
+//
+//
+//                        rotating=! flooralign(currentHeading,targetHeading);
+//                        if(!rotating) state=State.OUTTAKE;
+//
+//                    }
+//
+//                    break;
                 case OUTTAKE:
-                    Shooter();
-                    if (gamepad1.rightBumperWasPressed() && !shooting && !rotating){
+                   // Shooter();
+                    if (gamepad2.rightBumperWasPressed() && !shooting && !rotating){
                         canShoot = false;
                         telemetry.addLine("Button pressed");
                         telemetry.update();
-                        rotating = true;
+                        //rotating = true;
 
                     }
 
                     if (rotating){
-
-                        autoAlign();
+                       rotating=! flooralign(currentHeading,targetHeading);
+                       // autoAlign();
 
                     }
 
@@ -260,15 +270,69 @@ public class ModStarterTeleop extends LinearOpMode  {
     //
 
     public void statusupdate(){ //TODO
-    follower.update();
-    pose=follower.pose();
-    targetHeading = Math.toDegrees(Math.atan2(targetPose.y() - pose.y(), targetPose.x() - pose.x()));
+        follower.update();
+        pose=follower.pose();
+        currentHeading=pose.heading();
 
-
-
+        targetHeading = Math.toDegrees(Math.atan2(targetPose.y() - pose.y(), targetPose.x() - pose.x()));
+        dist = pose.distance(targetPose);
+        targetFlyVel = flySpeed(dist);
+        flyCurrentVel = Flywheel.getVelocity();
+        Hood.setPosition(flyHood(dist));
+        Flywheel.setPower(flyPIDF(flyCurrentVel,targetFlyVel ));
 
 
     }
+
+    public boolean timeraction()
+
+    {
+       if(stoptimers(1000,intake)) {intakeFront.setPower(0); return true;}
+       return false;
+
+    }
+
+    public boolean flooralign(double cHeading, double tHeading){
+
+
+        double offset=180;
+       double shootHeading =(cHeading+offset)%360;
+        double turnPower;
+        double error=tHeading-shootHeading ;
+        if (Math.abs(error) > 180)
+            error =-Math.signum(error) *(Math.abs(error)-360);// change rotation direction
+
+
+//        dashboardTelemetry.addData("error",error);
+       // return drivePID.calculate(error) - Math.signum(error) * driveKs;
+       turnPower= drivePID.calculate(error) ;
+
+
+//        telemetry.addData("Pose angle", Math.toDegrees(pose.heading()));
+//        telemetry.addData("Target angle", targetHeading);
+//        telemetry.addData("Error gap",  targetHeading-Math.toDegrees(pose.heading()));
+//        telemetry.update();
+        if (Math.abs(error)> 2){
+            leftFront.setPower(-turnPower);
+            leftBack.setPower(-turnPower);
+            rightFront.setPower(turnPower);
+            rightBack.setPower(turnPower);
+        }
+        else{
+            leftFront.setPower(0);
+            leftBack.setPower(0);
+            rightFront.setPower(0);
+            rightBack.setPower(0);
+            return true;
+
+        }
+
+        return false;
+
+
+    }
+
+
 
 
     public void autoAlign(){
