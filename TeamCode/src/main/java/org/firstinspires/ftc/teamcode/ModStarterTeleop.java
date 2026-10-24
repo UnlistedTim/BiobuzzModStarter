@@ -79,12 +79,21 @@ public class ModStarterTeleop extends LinearOpMode  {
     private final PoseFactory p = PoseFactory.degrees();
 
     public double targetX = -23+11, targetY = -70.6+55;
+    public double targetXredl = targetX, targetYredl = targetY;
+    public double targetXredh = targetX, targetYredh = -targetY;
+    public double targetXbluel = -targetX, targetYbluel = targetY;
+    public double targetXblueh = -targetX, targetYblueh = -targetY;
+
 
     public double targetHeading = 0,currentHeading=0;
 
     private final Pose startPose = p.of(startX,startY,-90);
 
-    private final Pose targetPose = p.of(targetX,targetY,-90);
+    private  Pose targetPose = p.of(targetX,targetY,-90);
+    private  Pose targetPoseredl = p.of(targetXredl,targetYredl,-90);
+    private  Pose targetPoseredh = p.of(targetXredh,targetYredh,-90);
+
+    public boolean colorRed=true;
 
 
 
@@ -267,12 +276,12 @@ public class ModStarterTeleop extends LinearOpMode  {
         follower.update();
         pose=follower.pose();
         currentHeading=Math.toDegrees(pose.heading());
+        if(pose.y()>0) targetPose=targetPoseredh; else targetPose=targetPoseredl;
         targetHeading = Math.toDegrees(Math.atan2(targetPose.y() - pose.y(), targetPose.x() - pose.x()));
         dist = pose.distance(targetPose);
         targetFlyVel = flySpeed(dist);
         flyCurrentVel = flyWheel.getVelocity();
         Hood.setPosition(flyHood(dist));
-
 
         flyWheel.setPower(flyPIDF(flyCurrentVel,targetFlyVel ));
 
@@ -353,7 +362,50 @@ public class ModStarterTeleop extends LinearOpMode  {
     }
 
 
+    public void getAutoVars(){
 
+//
+//        try {
+//            startHeading = (double) blackboard.get("Heading");
+//        }
+//        catch (NullPointerException e){
+//            startHeading = 0;
+//        }
+
+        try {
+            startX = (double) blackboard.get("X");
+        }
+
+        catch (NullPointerException e){
+
+            startX = 0;
+
+        }
+
+        try {
+            startY = (double) blackboard.get("Y");
+        }
+
+        catch (NullPointerException e){
+            startY =0;
+        }
+
+        try{
+            colorRed = (boolean) blackboard.get("COLOR");
+        }
+        catch (NullPointerException e){
+            colorRed = true;
+        }
+
+//        try{
+//            Tgap = (int) blackboard.get("T");
+//        }
+//        catch (NullPointerException e){
+//            Tgap= 0;
+//        }
+
+
+    }
 
     public void autoAlign(){
         double turn = mecanumPID(Math.toDegrees(pose.heading())+180,targetHeading );
@@ -403,6 +455,7 @@ public class ModStarterTeleop extends LinearOpMode  {
 //        follower = Constants.createFollower(hardwareMap);
         Hw_init();
         LUT_init();
+        follower.setPose(startPose);
         follower.setPose(startPose);
 
 
