@@ -52,7 +52,7 @@ public class ModStarterTeleop extends LinearOpMode  {
     private PIDController drivePID = new PIDController(0.02,0,0.0008);
  //   private PIDController drivePID = new PIDController(0.01,0,0.0008);
 
-    public final double driveKs = 0.09;
+    public final double driveKs = 0.1;
 
     boolean rotating = false;
 
@@ -173,7 +173,7 @@ public class ModStarterTeleop extends LinearOpMode  {
 
 
            if(outtakePhase) statusupdate();
-           if(intakeTimer&&outtakeTimer) timeraction();
+           if(intakeTimer || outtakeTimer) timeraction();
 
 
 
@@ -190,7 +190,7 @@ public class ModStarterTeleop extends LinearOpMode  {
 
 
                 case INTAKE:
-                    if (gamepad1.rightBumperWasReleased()){
+                    if (gamepad1.rightBumperWasPressed()){
                         intakeFront.setPower(-0.9);
                         leftRoller.setPower(0);
                         rightRoller.setPower(0);
@@ -205,12 +205,12 @@ public class ModStarterTeleop extends LinearOpMode  {
 
                 case ALIGN:
 
-                    if(gamepad1.rightBumperWasPressed()||aligNing) {
+                    if(gamepad1.rightBumperWasReleased()||aligNing) {
                          aligNing=true;
                          driVeable=false;
                          if(flooralign()) {
                            aligNing=false;
-                            state=State.OUTTAKE;
+                           state=State.OUTTAKE;
 
                         }
 
@@ -223,7 +223,7 @@ public class ModStarterTeleop extends LinearOpMode  {
 
                 case OUTTAKE:
 
-                    if ( Math.abs(flyCurrentVel - targetFlyVel) <40){
+                    if ( !driVeable && Math.abs(flyCurrentVel - targetFlyVel) <40){
                       //  intakeBack.setPower(0.5);
                         Blocker.setPosition(blockOpen);
                         stoptimers(0,outtake);
@@ -233,18 +233,22 @@ public class ModStarterTeleop extends LinearOpMode  {
                     }
                     if(driVeable&&!outtakeTimer) {
                         outtakePhase=false;
-                        state=State.IDLE;}
+                        state=State.IDLE;
+                    }
 
                     break;
 
             }
 
+            telemetry.addData("State", state);
+            telemetry.update();
 
-            dashboardTelemetry.addData("Current X", pose.x());
-            dashboardTelemetry.addData("Current Y", pose.y());
-            dashboardTelemetry.addData("Current theta", pose.heading());
-            dashboardTelemetry.addData("distance", pose.distance(targetPose));
-            dashboardTelemetry.update();
+
+//            dashboardTelemetry.addData("Current X", pose.x());
+//            dashboardTelemetry.addData("Current Y", pose.y());
+//            dashboardTelemetry.addData("Current theta", pose.heading());
+//            dashboardTelemetry.addData("distance", pose.distance(targetPose));
+//            dashboardTelemetry.update();
 
             if(driVeable)mecanumRobotCentricDrive(-gamepad1.right_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
 
@@ -269,11 +273,10 @@ public class ModStarterTeleop extends LinearOpMode  {
         flyCurrentVel = flyWheel.getVelocity();
         Hood.setPosition(flyHood(dist));
 
-        telemetry.addData("Target vel",targetFlyVel);
-        telemetry.addData("Current vel", flyCurrentVel);
+
         flyWheel.setPower(flyPIDF(flyCurrentVel,targetFlyVel ));
 
-        telemetry.update();
+
 
     }
 
@@ -314,12 +317,20 @@ public class ModStarterTeleop extends LinearOpMode  {
 
 //        dashboardTelemetry.addData("error",error);
        // return drivePID.calculate(error) - Math.signum(error) * driveKs;
-       turnPower= drivePID.calculate(error) ;
 
 
-        telemetry.addData("turn Power ", turnPower);
-        telemetry.addData("Error", error);
+
+       turnPower= drivePID.calculate(error);
+        telemetry.addData("Pid", turnPower);
+        turnPower+= Math.signum(turnPower) * driveKs;
+        telemetry.addData("Pid + Feedforward", turnPower);
         telemetry.update();
+
+
+
+//        telemetry.addData("turn Power ", turnPower);
+//        telemetry.addData("Error", error);
+//        telemetry.update();
 
         if (Math.abs(error)> 2){
             leftFront.setPower(turnPower);
@@ -380,7 +391,7 @@ public class ModStarterTeleop extends LinearOpMode  {
             error = currentHeading-targetHeading;
         }
 
-        dashboardTelemetry.addData("error",error);
+
         return drivePID.calculate(error) - Math.signum(error) * driveKs;
 
 
