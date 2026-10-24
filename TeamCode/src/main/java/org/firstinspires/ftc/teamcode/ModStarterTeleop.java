@@ -102,7 +102,7 @@ public class ModStarterTeleop extends LinearOpMode  {
     public Follower follower;
 
     public double flyCurrentVel = 0, targetFlyVel = 0;
-    public boolean outtakePhase=false,timer=false,aligNing=false,driVeable=true;
+    public boolean outtakePhase=false,timer=false,aligNing=false,driVeable=true, intakeTimer = false, outtakeTimer = false;
 
 
 
@@ -144,7 +144,7 @@ public class ModStarterTeleop extends LinearOpMode  {
 
     // --- Timers ---
     private ElapsedTime deltaT = new ElapsedTime();
-    private ElapsedTime outtakeTimer = new ElapsedTime();
+//    private ElapsedTime outtakeTimer = new ElapsedTime();
 
 
 
@@ -174,7 +174,6 @@ public class ModStarterTeleop extends LinearOpMode  {
 
            if(outtakePhase) statusupdate();
            if(timer) timer=!timeraction();
-           if(gamepad1.left_bumper)
 
 
 
@@ -184,21 +183,21 @@ public class ModStarterTeleop extends LinearOpMode  {
                     intakeFront.setPower(0.9);
                     intakeBack.setPower(0.5);
                     leftRoller.setPower(0.9);
-                    rightRoller.setPower(-0.9);
+                    rightRoller.setPower(0.9);
                     state = State.INTAKE;
                     break;
 
 
                 case INTAKE:
                     if (gamepad1.rightBumperWasReleased()){
+                        intakeTimer = true;
                         intakeFront.setPower(-0.9);
                         leftRoller.setPower(0);
                         rightRoller.setPower(0);
                         stoptimers(0,intake);
                         timer=true;
-                        Flywheel.setVelocity(shootVel);
-                        outtakePhase=true;
-                        state=State.OUTTAKE;
+                       outtakePhase=true;
+                        state=State.ALIGN;
                     }
 
                     break;
@@ -228,6 +227,7 @@ public class ModStarterTeleop extends LinearOpMode  {
                       //  intakeBack.setPower(0.5);
                         Blocker.setPosition(blockOpen);
                         stoptimers(0,outtake);
+                        outtakeTimer = true;
                         timer=true;
                         driVeable=true;
 
@@ -262,24 +262,44 @@ public class ModStarterTeleop extends LinearOpMode  {
     public void statusupdate(){ //TODO
         follower.update();
         pose=follower.pose();
-        currentHeading=pose.heading();
+        currentHeading=Math.toDegrees(pose.heading());
         targetHeading = Math.toDegrees(Math.atan2(targetPose.y() - pose.y(), targetPose.x() - pose.x()));
         dist = pose.distance(targetPose);
         targetFlyVel = flySpeed(dist);
         flyCurrentVel = Flywheel.getVelocity();
         Hood.setPosition(flyHood(dist));
+
+        telemetry.addData("Target vel",targetFlyVel);
+        telemetry.addData("Current vel", flyCurrentVel);
         Flywheel.setPower(flyPIDF(flyCurrentVel,targetFlyVel ));
+
+        telemetry.update();
 
     }
 
     public boolean timeraction()
 
     {
-       if(outtakePhase )
-            if (stoptimers(1000,outtake)) {Blocker.setPosition(blockClose);return true;}
+       if(intakeTimer ){
+           if (stoptimers(1000,intake)) {
+               Blocker.setPosition(blockClose);
+               outtakePhase = true;
+               intakeTimer = false;
+               return true;
+           }
+       }
 
-       else
-           if (stoptimers(1000,intake)) {intakeBack.setPower(0); return true;}
+       if (outtakeTimer){
+           if (stoptimers(1000,outtake)) {
+               intakeFront.setPower(0);
+               outtakePhase = false;
+               outtakeTimer = false;
+               return true;
+           }
+
+       }
+
+
        return false;
 
     }
@@ -299,15 +319,15 @@ public class ModStarterTeleop extends LinearOpMode  {
        turnPower= drivePID.calculate(error) ;
 
 
-//        telemetry.addData("Pose angle", Math.toDegrees(pose.heading()));
-//        telemetry.addData("Target angle", targetHeading);
-//        telemetry.addData("Error gap",  targetHeading-Math.toDegrees(pose.heading()));
-//        telemetry.update();
+        telemetry.addData("turn Power ", turnPower);
+        telemetry.addData("Error", error);
+        telemetry.update();
+
         if (Math.abs(error)> 2){
-            leftFront.setPower(-turnPower);
-            leftBack.setPower(-turnPower);
-            rightFront.setPower(turnPower);
-            rightBack.setPower(turnPower);
+            leftFront.setPower(turnPower);
+            leftBack.setPower(turnPower);
+            rightFront.setPower(-turnPower);
+            rightBack.setPower(-turnPower);
         }
         else{
             leftFront.setPower(0);
@@ -398,8 +418,9 @@ public class ModStarterTeleop extends LinearOpMode  {
     }
 
     public void afterstart() {
+
+        pose = follower.pose();
         // deltaT.reset();
-        outtakeTimer.reset();
         runtime.reset();
 
         Blocker.setPosition(blockClose);
@@ -595,6 +616,8 @@ public class ModStarterTeleop extends LinearOpMode  {
         double velError = targetVel-currentVel;
         double pid = flyp * velError;
         double ff = flyv * targetVel + Math.signum(velError) * flys;
+
+        telemetry.addData("flypid power" , pid + ff);
 //        dashboardTelemetry.addData("Total power", pid+ff);
 //        dashboardTelemetry.addData("PID", pid);
 //        dashboardTelemetry.addData("FF", ff);
