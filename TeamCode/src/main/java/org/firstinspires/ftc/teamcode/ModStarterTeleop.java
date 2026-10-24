@@ -43,7 +43,7 @@ public class ModStarterTeleop extends LinearOpMode  {
 
     private DcMotorEx intakeBack,intakeFront, Flywheel,  leftFront, rightFront, leftBack, rightBack;
 
-    private Servo Hood, Blocker;
+    private Servo Hood, Blocker,Flower;
 
     private CRServo leftRoller, rightRoller;
 
@@ -102,7 +102,8 @@ public class ModStarterTeleop extends LinearOpMode  {
     public Follower follower;
 
     public double flyCurrentVel = 0, targetFlyVel = 0;
-    public boolean outtakePhase=false,timer=false;
+    public boolean outtakePhase=false,timer=false,aligNing=false,driVeable=true;
+
 
 
 
@@ -128,6 +129,7 @@ public class ModStarterTeleop extends LinearOpMode  {
 
         IDLE,
         INTAKE,
+        ALIGN,
         TRANS,
         OUTTAKE
     }
@@ -172,6 +174,7 @@ public class ModStarterTeleop extends LinearOpMode  {
 
            if(outtakePhase) statusupdate();
            if(timer) timer=!timeraction();
+           if(gamepad1.left_bumper)
 
 
 
@@ -180,13 +183,17 @@ public class ModStarterTeleop extends LinearOpMode  {
                     outtakePhase=false;
                     intakeFront.setPower(0.9);
                     intakeBack.setPower(0.5);
+                    leftRoller.setPower(0.9);
+                    rightRoller.setPower(-0.9);
                     state = State.INTAKE;
                     break;
 
 
                 case INTAKE:
-                    if (gamepad2.rightBumperWasPressed()){
+                    if (gamepad1.rightBumperWasReleased()){
                         intakeFront.setPower(-0.9);
+                        leftRoller.setPower(0);
+                        rightRoller.setPower(0);
                         stoptimers(0,intake);
                         timer=true;
                         Flywheel.setVelocity(shootVel);
@@ -194,61 +201,41 @@ public class ModStarterTeleop extends LinearOpMode  {
                         state=State.OUTTAKE;
                     }
 
+                    break;
 
+
+                case ALIGN:
+
+                    if(gamepad1.rightBumperWasPressed()||aligNing) {
+                         aligNing=true;
+                         driVeable=false;
+                         if(flooralign()) {
+                           aligNing=false;
+                            state=State.OUTTAKE;
+
+                        }
+
+
+                    }
 
                     break;
 
 
-//                case TRANS:
-//
-//                    if (!intakeDone&& stoptimers(500, intake)){
-//                        intakeFront.setPower(0);
-//                        intakeDone=true;
-//                    }
-//
-//                    if (rotating||gamepad2.rightBumperWasPressed()){
-//
-//
-//                        rotating=! flooralign(currentHeading,targetHeading);
-//                        if(!rotating) state=State.OUTTAKE;
-//
-//                    }
-//
-//                    break;
+
                 case OUTTAKE:
-                   // Shooter();
-                    if (gamepad2.rightBumperWasPressed() && !shooting && !rotating){
-                        canShoot = false;
-                        telemetry.addLine("Button pressed");
-                        telemetry.update();
-                        //rotating = true;
 
-                    }
-
-                    if (rotating){
-                       rotating=! flooralign(currentHeading,targetHeading);
-                       // autoAlign();
-
-                    }
-
-
-                    if (canShoot &&  !rotating && !shooting && Math.abs(flyCurrentVel - targetFlyVel) <40){
-                        intakeBack.setPower(0.5);
+                    if ( Math.abs(flyCurrentVel - targetFlyVel) <40){
+                      //  intakeBack.setPower(0.5);
                         Blocker.setPosition(blockOpen);
-                        shooting = true;
-                        canShoot = false;
                         stoptimers(0,outtake);
-                    }
+                        timer=true;
+                        driVeable=true;
 
-                    if (shooting && stoptimers(1000,outtake)){
-                        Blocker.setPosition(blockClose);
-                        shooting = false;
-                        state = State.IDLE;
+
                     }
+                    if(driVeable&&!timer) state=State.IDLE;
+
                     break;
-
-
-
 
             }
 
@@ -259,7 +246,7 @@ public class ModStarterTeleop extends LinearOpMode  {
             dashboardTelemetry.addData("distance", pose.distance(targetPose));
             dashboardTelemetry.update();
 
-            mecanumRobotCentricDrive(-gamepad1.right_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
+            if(driVeable)mecanumRobotCentricDrive(-gamepad1.right_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
 
 
 
@@ -276,7 +263,6 @@ public class ModStarterTeleop extends LinearOpMode  {
         follower.update();
         pose=follower.pose();
         currentHeading=pose.heading();
-
         targetHeading = Math.toDegrees(Math.atan2(targetPose.y() - pose.y(), targetPose.x() - pose.x()));
         dist = pose.distance(targetPose);
         targetFlyVel = flySpeed(dist);
@@ -284,24 +270,26 @@ public class ModStarterTeleop extends LinearOpMode  {
         Hood.setPosition(flyHood(dist));
         Flywheel.setPower(flyPIDF(flyCurrentVel,targetFlyVel ));
 
-
     }
 
     public boolean timeraction()
 
     {
-       if(stoptimers(1000,intake)) {intakeFront.setPower(0); return true;}
+       if(outtakePhase )
+            if (stoptimers(1000,outtake)) {Blocker.setPosition(blockClose);return true;}
+
+       else
+           if (stoptimers(1000,intake)) {intakeBack.setPower(0); return true;}
        return false;
 
     }
 
-    public boolean flooralign(double cHeading, double tHeading){
-
+    public boolean flooralign(){
 
         double offset=180;
-       double shootHeading =(cHeading+offset)%360;
+       double shootHeading =(currentHeading+offset)%360;
         double turnPower;
-        double error=tHeading-shootHeading ;
+        double error=targetHeading-shootHeading ;
         if (Math.abs(error) > 180)
             error =-Math.signum(error) *(Math.abs(error)-360);// change rotation direction
 
@@ -441,6 +429,7 @@ public class ModStarterTeleop extends LinearOpMode  {
 
         Hood = hardwareMap.get(Servo.class, "Hood");
         Blocker = hardwareMap.get(Servo.class, "Blocker");
+        //Flower = hardwareMap.get(Servo.class, "Flower");
 
 //        Flywheel = hardwareMap.get(DcMotorEx.class, "Flywheel");
         intakeFront = hardwareMap.get(DcMotorEx.class,"intakeFront");
