@@ -41,7 +41,7 @@ public class ModStarterTeleop extends LinearOpMode  {
 
     Pose pose;
 
-    private DcMotorEx intakeBack,intakeFront, Flywheel,  leftFront, rightFront, leftBack, rightBack;
+    private DcMotorEx intakeBack,intakeFront, flyWheel,  leftFront, rightFront, leftBack, rightBack;
 
     private Servo Hood, Blocker,Flower;
 
@@ -173,13 +173,14 @@ public class ModStarterTeleop extends LinearOpMode  {
 
 
            if(outtakePhase) statusupdate();
-           if(timer) timer=!timeraction();
+           if(intakeTimer&&outtakeTimer) timeraction();
 
 
 
             switch (state){
                 case IDLE:
-                    outtakePhase=false;
+
+                    flyWheel.setPower(0.4);
                     intakeFront.setPower(0.9);
                     intakeBack.setPower(0.5);
                     leftRoller.setPower(0.9);
@@ -190,13 +191,12 @@ public class ModStarterTeleop extends LinearOpMode  {
 
                 case INTAKE:
                     if (gamepad1.rightBumperWasReleased()){
-                        intakeTimer = true;
                         intakeFront.setPower(-0.9);
                         leftRoller.setPower(0);
                         rightRoller.setPower(0);
+                        intakeTimer = true;
                         stoptimers(0,intake);
-                        timer=true;
-                       outtakePhase=true;
+                        outtakePhase=true;
                         state=State.ALIGN;
                     }
 
@@ -227,13 +227,13 @@ public class ModStarterTeleop extends LinearOpMode  {
                       //  intakeBack.setPower(0.5);
                         Blocker.setPosition(blockOpen);
                         stoptimers(0,outtake);
-                        outtakeTimer = true;
-                        timer=true;
+                        outtakeTimer = true;//
                         driVeable=true;
 
-
                     }
-                    if(driVeable&&!timer) state=State.IDLE;
+                    if(driVeable&&!outtakeTimer) {
+                        outtakePhase=false;
+                        state=State.IDLE;}
 
                     break;
 
@@ -266,12 +266,12 @@ public class ModStarterTeleop extends LinearOpMode  {
         targetHeading = Math.toDegrees(Math.atan2(targetPose.y() - pose.y(), targetPose.x() - pose.x()));
         dist = pose.distance(targetPose);
         targetFlyVel = flySpeed(dist);
-        flyCurrentVel = Flywheel.getVelocity();
+        flyCurrentVel = flyWheel.getVelocity();
         Hood.setPosition(flyHood(dist));
 
         telemetry.addData("Target vel",targetFlyVel);
         telemetry.addData("Current vel", flyCurrentVel);
-        Flywheel.setPower(flyPIDF(flyCurrentVel,targetFlyVel ));
+        flyWheel.setPower(flyPIDF(flyCurrentVel,targetFlyVel ));
 
         telemetry.update();
 
@@ -282,8 +282,7 @@ public class ModStarterTeleop extends LinearOpMode  {
     {
        if(intakeTimer ){
            if (stoptimers(1000,intake)) {
-               Blocker.setPosition(blockClose);
-               outtakePhase = true;
+               intakeFront.setPower(0);
                intakeTimer = false;
                return true;
            }
@@ -291,8 +290,7 @@ public class ModStarterTeleop extends LinearOpMode  {
 
        if (outtakeTimer){
            if (stoptimers(1000,outtake)) {
-               intakeFront.setPower(0);
-               outtakePhase = false;
+               Blocker.setPosition(blockClose);
                outtakeTimer = false;
                return true;
            }
@@ -389,16 +387,7 @@ public class ModStarterTeleop extends LinearOpMode  {
 
     }
 
-    public void Shooter(){
 
-        dist = pose.distance(targetPose);
-        targetFlyVel = flySpeed(dist);
-
-        flyCurrentVel = Flywheel.getVelocity();
-        Hood.setPosition(flyHood(dist));
-        Flywheel.setPower(flyPIDF(flyCurrentVel,targetFlyVel ));
-
-    }
     public void initalize() {
 //        follower = Constants.createFollower(hardwareMap);
         Hw_init();
@@ -442,7 +431,7 @@ public class ModStarterTeleop extends LinearOpMode  {
         rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
         leftBack = hardwareMap.get(DcMotorEx.class, "leftBack");
         rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
-        Flywheel = hardwareMap.get(DcMotorEx.class, "Flywheel");
+        flyWheel = hardwareMap.get(DcMotorEx.class, "Flywheel");
         follower = Constants.create(hardwareMap);
 
         leftRoller = hardwareMap.get(CRServo.class, "leftRoller");
@@ -479,8 +468,8 @@ public class ModStarterTeleop extends LinearOpMode  {
         rightRoller.setDirection(DcMotorSimple.Direction.FORWARD);
 
 
-        Flywheel.setDirection(DcMotorSimple.Direction.FORWARD);
-        Flywheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        flyWheel.setDirection(DcMotorSimple.Direction.FORWARD);
+        flyWheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
