@@ -43,13 +43,13 @@ public class ModStarterTeleop extends LinearOpMode  {
 
     private DcMotorEx intakeBack,intakeFront, flyWheel,  leftFront, rightFront, leftBack, rightBack;
 
-    private Servo Hood, Blocker,Flower;
+    private Servo Hood, Blocker,Flower, Flipper;
 
     private CRServo leftRoller, rightRoller;
 
     private VoltageSensor voltageSensor;
 
-    private PIDController drivePID = new PIDController(0.02,0,0.0008);
+    private PIDController drivePID = new PIDController(0.015,0,0.0008);
  //   private PIDController drivePID = new PIDController(0.01,0,0.0008);
 
     public final double driveKs = 0.1;
@@ -69,6 +69,8 @@ public class ModStarterTeleop extends LinearOpMode  {
 
 
     public final double hoodCollapse = 0.38, hoodExtend = 0.28, hoodShoot = 0.35;
+
+    public final double flipperExtend = 0.38, flipperCollapse = 0.75;
 
     public final double blockClose = 0.63, blockOpen = 0.27;
 
@@ -191,7 +193,7 @@ public class ModStarterTeleop extends LinearOpMode  {
 
                     flyWheel.setPower(0.4);
                     intakeFront.setPower(0.9);
-                    intakeBack.setPower(0.5);
+                    intakeBack.setPower(0.7);
                     leftRoller.setPower(0.9);
                     rightRoller.setPower(0.9);
                     state = State.INTAKE;
@@ -199,7 +201,7 @@ public class ModStarterTeleop extends LinearOpMode  {
 
 
                 case INTAKE:
-                    if (gamepad1.rightBumperWasPressed()){
+                    if (gamepad2.rightBumperWasPressed()){
                         intakeFront.setPower(-0.9);
                         leftRoller.setPower(0);
                         rightRoller.setPower(0);
@@ -214,7 +216,7 @@ public class ModStarterTeleop extends LinearOpMode  {
 
                 case ALIGN:
 
-                    if(gamepad1.rightBumperWasReleased()||aligNing) {
+                    if(gamepad1.rightBumperWasPressed()||aligNing) {
                          aligNing=true;
                          driVeable=false;
                          if(flooralign()) {
@@ -250,6 +252,8 @@ public class ModStarterTeleop extends LinearOpMode  {
             }
 
             telemetry.addData("State", state);
+            telemetry.addData("Intake timer", intakeTimer);
+            telemetry.addData("Outtake timer", outtakeTimer);
             telemetry.update();
 
 
@@ -330,10 +334,10 @@ public class ModStarterTeleop extends LinearOpMode  {
 
 
        turnPower= drivePID.calculate(error);
-        telemetry.addData("Pid", turnPower);
+//        telemetry.addData("Pid", turnPower);
         turnPower+= Math.signum(turnPower) * driveKs;
-        telemetry.addData("Pid + Feedforward", turnPower);
-        telemetry.update();
+//        telemetry.addData("Pid + Feedforward", turnPower);
+//        telemetry.update();
 
 
 
@@ -410,11 +414,11 @@ public class ModStarterTeleop extends LinearOpMode  {
     public void autoAlign(){
         double turn = mecanumPID(Math.toDegrees(pose.heading())+180,targetHeading );
 
-        telemetry.addData("Pose angle", Math.toDegrees(pose.heading()));
-        telemetry.addData("Target angle", targetHeading);
-        telemetry.addData("Error gap",  targetHeading-Math.toDegrees(pose.heading()));
-        telemetry.update();
-        if (Math.abs(targetHeading-(Math.toDegrees(pose.heading()) - 180)) > 3 ){
+//        telemetry.addData("Pose angle", Math.toDegrees(pose.heading()));
+//        telemetry.addData("Target angle", targetHeading);
+//        telemetry.addData("Error gap",  targetHeading-Math.toDegrees(pose.heading()));
+//        telemetry.update();
+        if (Math.abs(targetHeading-(Math.toDegrees(pose.heading()) - 180)) > 1 ){
             leftFront.setPower(-turn);
             leftBack.setPower(-turn);
             rightFront.setPower(turn);
@@ -456,7 +460,7 @@ public class ModStarterTeleop extends LinearOpMode  {
         Hw_init();
         LUT_init();
         follower.setPose(startPose);
-        follower.setPose(startPose);
+//        follower.setPose(startPose);
 
 
 
@@ -478,6 +482,7 @@ public class ModStarterTeleop extends LinearOpMode  {
 
         Blocker.setPosition(blockClose);
         Hood.setPosition(hoodShoot);
+        Flipper.setPosition(flipperCollapse);
 
 
     }
@@ -503,6 +508,7 @@ public class ModStarterTeleop extends LinearOpMode  {
 
         Hood = hardwareMap.get(Servo.class, "Hood");
         Blocker = hardwareMap.get(Servo.class, "Blocker");
+        Flipper = hardwareMap.get(Servo.class, "Flipper");
         //Flower = hardwareMap.get(Servo.class, "Flower");
 
 //        Flywheel = hardwareMap.get(DcMotorEx.class, "Flywheel");
@@ -670,7 +676,7 @@ public class ModStarterTeleop extends LinearOpMode  {
         double pid = flyp * velError;
         double ff = flyv * targetVel + Math.signum(velError) * flys;
 
-        telemetry.addData("flypid power" , pid + ff);
+//        telemetry.addData("flypid power" , pid + ff);
 //        dashboardTelemetry.addData("Total power", pid+ff);
 //        dashboardTelemetry.addData("PID", pid);
 //        dashboardTelemetry.addData("FF", ff);
