@@ -37,13 +37,14 @@ import java.util.List;
 @Config
 
 
-public class ModStarterTeleop extends LinearOpMode  {
+public class Teleop extends LinearOpMode  {
 
     Pose pose;
+    public base rbg ;
 
     private DcMotorEx intakeBack,intakeFront, flyWheel,  leftFront, rightFront, leftBack, rightBack;
 
-    private Servo Hood, Blocker,Flower, Flipper;
+    private Servo Hood, Blocker, Flipper;
 
     private CRServo leftRoller, rightRoller;
 
@@ -62,8 +63,6 @@ public class ModStarterTeleop extends LinearOpMode  {
     InterpLUT Hoodlut = new InterpLUT();
 
     double dist = 0;
-
-
     public final double flyp = 0.012, flyi=0, flyd = 0, flyv = 0.00036, flys = 0.04;
 
 
@@ -76,24 +75,24 @@ public class ModStarterTeleop extends LinearOpMode  {
 
     public boolean shooting = false, canShoot = false;
 
-    public double startX = -16.01 , startY = -55.49;
+//    public static final double  startX1 = -16.01 , startY1 = -55.49;
+  public double  startX = 0 , startY = 0,startHeading=0;
+//    public static final double  startXred1=startX1, startYred1=startY1,startHeadingred1=-90;
+//    public static final double startXblue1=-startX1,startYbue1=-startY1 ,startHeadingblue1=90;
 
     private final PoseFactory p = PoseFactory.degrees();
 
-    public double targetX = -23+11, targetY = -70.6+55;
-    public double targetXredl = targetX, targetYredl = targetY;
-    public double targetXredh = targetX, targetYredh = -targetY;
-    public double targetXbluel = -targetX, targetYbluel = targetY;
-    public double targetXblueh = -targetX, targetYblueh = -targetY;
+//    public double targetX = -23+11, targetY = -70.6+55;
+
 
 
     public double targetHeading = 0,currentHeading=0;
 
-    private final Pose startPose = p.of(startX,startY,-90);
+    public  Pose startPose ;
 
-    private  Pose targetPose = p.of(targetX,targetY,-90);
-    private  Pose targetPoseredl = p.of(targetXredl,targetYredl,-90);
-    private  Pose targetPoseredh = p.of(targetXredh,targetYredh,-90);
+  private  Pose targetPose ;
+//    private  Pose targetPoseredl = p.of(targetXredl,targetYredl,-90);
+//    private  Pose targetPoseredh = p.of(targetXredh,targetYredh,-90);
 
     public boolean colorRed=true;
 
@@ -114,7 +113,7 @@ public class ModStarterTeleop extends LinearOpMode  {
 
     public double flyCurrentVel = 0, targetFlyVel = 0;
     public boolean outtakePhase=false,timer=false,aligNing=false,driVeable=true, intakeTimer = false, outtakeTimer = false;
-
+    private boolean flipperFlag=false,recevieinfo=false;
 
 
 
@@ -165,7 +164,47 @@ public class ModStarterTeleop extends LinearOpMode  {
     public void runOpMode() {
 
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
+        rbg= new base();
         initalize();
+        getAutoVars();
+
+        // buildPaths();
+
+        if (colorRed) telemetry.addLine("Red  Selected");
+        else telemetry.addLine("Blue  Selected");
+        telemetry.addLine("Driver Cross select Blue side");
+        telemetry.addLine("Driver Circle select  Red  side");
+        telemetry.addLine("Gunner Right Bumper Confrim afters election");
+        telemetry.addLine("*******************************************");
+        telemetry.update();
+
+        while (!isStarted() && !isStopRequested()) {
+            if (gamepad1.cross) {
+                colorRed = false;
+                recevieinfo = true;
+
+            }
+            if (gamepad1.circle) {
+                colorRed = true;
+                recevieinfo = true;
+
+            }
+            if (recevieinfo) {
+
+                break;
+            }
+
+        }
+
+
+        if (colorRed) telemetry.addLine("Red Alliance Selected");
+        else telemetry.addLine("Blue Alliance Selected");
+
+        telemetry.update();
+        if (recevieinfo) {
+            startPose= rbg.start(colorRed);
+            recevieinfo=false;
+        }
 
 
 //        Pinpoint.setPosition(new Pose2D(DistanceUnit.INCH, startX, startY, AngleUnit.RADIANS, startHeading));
@@ -201,8 +240,19 @@ public class ModStarterTeleop extends LinearOpMode  {
 
 
                 case INTAKE:
+                    if(gamepad2.leftBumperWasReleased()){
+
+                        flipperFlag=!flipperFlag;
+                        if(flipperFlag)
+                            Flipper.setPosition(flipperExtend);
+                        else  Flipper.setPosition(flipperCollapse);
+                    }
+
+
                     if (gamepad2.rightBumperWasPressed()){
                         intakeFront.setPower(-0.9);
+                        Flipper.setPosition(flipperCollapse);
+                        flipperFlag=false;
                         leftRoller.setPower(0);
                         rightRoller.setPower(0);
                         intakeTimer = true;
@@ -210,6 +260,8 @@ public class ModStarterTeleop extends LinearOpMode  {
                         outtakePhase=true;
                         state=State.ALIGN;
                     }
+
+
 
                     break;
 
@@ -279,16 +331,22 @@ public class ModStarterTeleop extends LinearOpMode  {
     public void statusupdate(){ //TODO
         follower.update();
         pose=follower.pose();
-        currentHeading=Math.toDegrees(pose.heading());
-        if(pose.y()>0) targetPose=targetPoseredh; else targetPose=targetPoseredl;
-        targetHeading = Math.toDegrees(Math.atan2(targetPose.y() - pose.y(), targetPose.x() - pose.x()));
-        dist = pose.distance(targetPose);
-        targetFlyVel = flySpeed(dist);
         flyCurrentVel = flyWheel.getVelocity();
-        Hood.setPosition(flyHood(dist));
-
-        flyWheel.setPower(flyPIDF(flyCurrentVel,targetFlyVel ));
-
+        double offset=0;
+        currentHeading=Math.toDegrees(pose.heading());
+        if(pose.y()>0) {
+           if(colorRed) targetPose = rbg.targetPoseredh;
+           else targetPose = rbg.targetPoseblueh;
+        }
+         else {
+             offset=180;
+            if(colorRed) targetPose = rbg.targetPoseredl;
+            else targetPose = rbg.targetPosebluel;
+        }
+        targetHeading = Math.toDegrees(Math.atan2(targetPose.y() - pose.y(), targetPose.x() - pose.x()))+offset;
+        dist = pose.distance(targetPose);
+        Hood.setPosition(rbg.flyHood(dist));
+        flyWheel.setPower(rbg.flyPIDF(flyCurrentVel,rbg.flySpeed(dist) ));
 
 
     }
@@ -320,12 +378,12 @@ public class ModStarterTeleop extends LinearOpMode  {
 
     public boolean flooralign(){
 
-        double offset=180;
-       double shootHeading =(currentHeading+offset)%360;
+
+        double shootHeading =currentHeading%360;
         double turnPower;
         double error=targetHeading-shootHeading ;
         if (Math.abs(error) > 180)
-            error =-Math.signum(error) *(Math.abs(error)-360);// change rotation direction
+            error =-Math.signum(error) *Math.abs(360-Math.abs(error));// change rotation direction
 
 
 //        dashboardTelemetry.addData("error",error);
@@ -334,17 +392,9 @@ public class ModStarterTeleop extends LinearOpMode  {
 
 
        turnPower= drivePID.calculate(error);
-//        telemetry.addData("Pid", turnPower);
-        turnPower+= Math.signum(turnPower) * driveKs;
-//        telemetry.addData("Pid + Feedforward", turnPower);
-//        telemetry.update();
 
-
-
-//        telemetry.addData("turn Power ", turnPower);
-//        telemetry.addData("Error", error);
-//        telemetry.update();
-
+       turnPower+= Math.signum(turnPower) * driveKs;
+//
         if (Math.abs(error)> 2){
             leftFront.setPower(turnPower);
             leftBack.setPower(turnPower);
@@ -394,9 +444,19 @@ public class ModStarterTeleop extends LinearOpMode  {
             startY =0;
         }
 
+
+        try {
+            startHeading = (double) blackboard.get("Heading");
+        }
+
+        catch (NullPointerException e){
+            startHeading =0;
+        }
+
         try{
             colorRed = (boolean) blackboard.get("COLOR");
         }
+
         catch (NullPointerException e){
             colorRed = true;
         }
@@ -458,7 +518,7 @@ public class ModStarterTeleop extends LinearOpMode  {
     public void initalize() {
 //        follower = Constants.createFollower(hardwareMap);
         Hw_init();
-        LUT_init();
+
         follower.setPose(startPose);
 //        follower.setPose(startPose);
 
@@ -477,13 +537,10 @@ public class ModStarterTeleop extends LinearOpMode  {
     public void afterstart() {
 
         pose = follower.pose();
-        // deltaT.reset();
         runtime.reset();
-
         Blocker.setPosition(blockClose);
         Hood.setPosition(hoodShoot);
         Flipper.setPosition(flipperCollapse);
-
 
     }
 
@@ -550,49 +607,30 @@ public class ModStarterTeleop extends LinearOpMode  {
         rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rbg. LUT_init();
 
 
 
 
     }
 
-    public void LUT_init(){
-
-        Flylut.add(0 , 1000); Hoodlut.add(0 , 0.3);
-        Flylut.add(20.79 , 1090); Hoodlut.add(20.79 , 0.315);
-        Flylut.add(38.23 , 1120); Hoodlut.add(38.23 , 0.335);
-        Flylut.add(45.26,1130); Hoodlut.add(45.26,0.345);
-        Flylut.add(56.61,1180); Hoodlut.add(56.61,0.35);
-        Flylut.add(200,1250); Hoodlut.add(200,0.37);
-
-        Flylut.createLUT();
-        Hoodlut.createLUT();
-
-    }
-
-    public double flyHood(double dist){
-        if (dist < 56.6 && dist > 20.7) {
-
-            return Hoodlut.get(dist);
-
-//            Tx_offset=0;
-
-        }
-        else return 0.34;//1500
-    }
-
-    public double flySpeed(double dist){
-        if (dist < 56.6 && dist > 20.7) {
-
-            return Flylut.get(dist);// Tx offset
-
-//            Tx_offset=0;
-
-        }
-        else return 1130;
+//    public void LUT_init(){
+//
+//        Flylut.add(0 , 1000); Hoodlut.add(0 , 0.3);
+//        Flylut.add(20.79 , 1090); Hoodlut.add(20.79 , 0.315);
+//        Flylut.add(38.23 , 1120); Hoodlut.add(38.23 , 0.335);
+//        Flylut.add(45.26,1130); Hoodlut.add(45.26,0.345);
+//        Flylut.add(56.61,1180); Hoodlut.add(56.61,0.35);
+//        Flylut.add(200,1250); Hoodlut.add(200,0.37);
+//
+//        Flylut.createLUT();
+//        Hoodlut.createLUT();
+//
+//    }
 
 
-    }
+
+
 
 
     public boolean stoptimers(double period, int i) {
@@ -671,18 +709,7 @@ public class ModStarterTeleop extends LinearOpMode  {
         //  telemetry.update();
     }
 
-    public double flyPIDF(double currentVel, double targetVel){
-        double velError = targetVel-currentVel;
-        double pid = flyp * velError;
-        double ff = flyv * targetVel + Math.signum(velError) * flys;
 
-//        telemetry.addData("flypid power" , pid + ff);
-//        dashboardTelemetry.addData("Total power", pid+ff);
-//        dashboardTelemetry.addData("PID", pid);
-//        dashboardTelemetry.addData("FF", ff);
-
-        return pid + ff;
-    }
 
 
 

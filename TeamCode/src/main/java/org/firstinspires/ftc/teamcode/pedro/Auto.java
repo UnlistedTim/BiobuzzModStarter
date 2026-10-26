@@ -7,29 +7,37 @@ import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-
 import static com.pedropathing.api.Paths.line;
 import static com.pedropathing.ivy.Scheduler.schedule;
 import static com.pedropathing.ivy.groups.Groups.sequential;
 import static com.pedropathing.ivy.pedro.PedroCommands.follow;
+import org.firstinspires.ftc.teamcode.Teleop;
+
 
 @Autonomous
 public class Auto extends OpMode {
     private Follower follower;
     private final PoseFactory poseFactory = PoseFactory.degrees();
-    public double startX1 = -16.01 , startY1 = -55.49;
-    public double  startXred1=startX1,startYred1=startY1 ;
-    public double  startXblue1=-startX1,startYr1=-startY1 ;
-    private double startX = -16.01 , startY = -55.49;
+    public double startX1 = -16.01 , startY1 = -55.49,startHeading1=-90;
+//    public double  startXred1=startX1,startYred1=startY1 ,startHeadingred1=-90;
+//    public double  startXblue1=-startX1,startYbue1=-startY1 ,startHeadingblue1=90;
+    private double startX = -16.01 , startY = -55.49,startHeading=-90;
+
+    public  Pose startPose = poseFactory.of(startX,startY,-90);
+    private final  double targetX = -23+11, targetY = -70.6+55;
+//    public double targetXredl = targetX, targetYredl = targetY;
+//    public double targetXredh = targetX, targetYredh = -targetY;
+//    public double targetXbluel = -targetX, targetYbluel = targetY;
+//    public double targetXblueh = -targetX, targetYblueh = -targetY;
 
     // Poses
    // private final Pose startPose = poseFactory.of(24, 24, 0);
     private final Pose scorePose = poseFactory.of(48, 48, 90);
     private final Pose parkPose = poseFactory.of(72, 48, 90);
-    private  Pose startPose = poseFactory.of(startX,startY,-90);
 
 
-    private double targetX = -23+11, targetY = -70.6+55;
+
+   // private double targetX = -23+11, targetY = -70.6+55;
     public boolean recevieinfo=false,colorRed=true,configured=false;
 
     // Path methods
@@ -52,10 +60,8 @@ public class Auto extends OpMode {
     @Override
     public void init() {
         Scheduler.reset();
-
         follower = Constants.create(hardwareMap);
-        follower.setPose(startPose);
-        follower.update();
+
 
 
         // telemetry.addLine("Turn the camera to the shooting target");
@@ -91,7 +97,6 @@ public class Auto extends OpMode {
 
         if (gamepad1.crossWasPressed()) {
             colorRed = false;
-
             recevieinfo = true;
 
         }
@@ -107,13 +112,13 @@ public class Auto extends OpMode {
         if(recevieinfo)
 
         {
-            telemetry.addLine("Driver Cross X       ------->  Blue ");
-            telemetry.addLine("Driver CircleO       ------->  Red ");
-//            telemetry.addLine("Gunner Triangle      ------->  3rd Row Auto");
-//            telemetry.addLine("Gunner Square        ------->  Non-3rd Row Auto");
-            telemetry.addLine("Gunner right bumper   -------> Confirm");
-            telemetry.addLine(".......................................");
-            telemetry.addLine("");
+//            telemetry.addLine("Driver Cross X       ------->  Blue ");
+//            telemetry.addLine("Driver CircleO       ------->  Red ");
+////            telemetry.addLine("Gunner Triangle      ------->  3rd Row Auto");
+////            telemetry.addLine("Gunner Square        ------->  Non-3rd Row Auto");
+//            telemetry.addLine("Gunner right bumper   -------> Confirm");
+//            telemetry.addLine(".......................................");
+//            telemetry.addLine("");
 
 //            if(cameraready)  telemetry.addLine("Camera Good!");
 //            else  telemetry.addLine("Camera has issue! Pls check or restart it!!!!");
@@ -127,10 +132,16 @@ public class Auto extends OpMode {
 
         }
 
-        if(gamepad2.rightBumperWasPressed()&& !configured){
+        if(gamepad2.rightBumperWasPressed() && !configured){
 
             configured=true;
             if (colorRed) {
+                startX=Teleop.startXred1;startY=Teleop.startYred1;startHeading=Teleop.startHeadingred1;
+            }
+            else {startX=startXblue1;startY=startYbue1;startHeading=startHeadingblue1;}
+
+            startPose=poseFactory.of(startX,startY,startHeading);
+
                // Limelight.pipelineSwitch(2);//6 for red
 //                rbga.targetGoalY=rbga.targetGoalY-rbga.rfyoffset;
 //                rbga.targetGoalX=rbga.targetGoalX-rbga.rfxoffset;
@@ -138,16 +149,16 @@ public class Auto extends OpMode {
 
 
 
-            }
-            else {
-//                autoTurretOffset = 4;
-//                Limelight.pipelineSwitch(3);//7 for blue
-//                rbga.targetGoalY=rbga.targetGoalY-rbga.bfyoffset;
-//                rbga.targetGoalX=0-rbga.bfxoffset;
-
-
-
-            }
+//            }
+//            else {
+////                autoTurretOffset = 4;
+////                Limelight.pipelineSwitch(3);//7 for blue
+////                rbga.targetGoalY=rbga.targetGoalY-rbga.bfyoffset;
+////                rbga.targetGoalX=0-rbga.bfxoffset;
+//
+//
+//
+//            }
 
            // Limelight.start();
 
@@ -170,6 +181,8 @@ public class Auto extends OpMode {
 
     @Override
     public void start() {
+        follower.setPose(startPose);
+        follower.update();
         schedule(autoRoutine());
     }
 
@@ -177,6 +190,7 @@ public class Auto extends OpMode {
     public void loop() {
         follower.update();
         Scheduler.execute();
+        Teleop.
         // add your other methods needed in the loop here
 
         telemetry.addData("X", follower.pose().x());
