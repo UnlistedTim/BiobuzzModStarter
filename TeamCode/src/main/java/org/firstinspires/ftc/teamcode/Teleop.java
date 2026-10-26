@@ -50,20 +50,14 @@ public class Teleop extends LinearOpMode  {
 
     private VoltageSensor voltageSensor;
 
-    private PIDController drivePID = new PIDController(0.015,0,0.0008);
- //   private PIDController drivePID = new PIDController(0.01,0,0.0008);
-
-    public final double driveKs = 0.1;
-
-    boolean rotating = false;
 
 
-    InterpLUT Flylut = new InterpLUT();
 
-    InterpLUT Hoodlut = new InterpLUT();
+
+
 
     double dist = 0;
-    public final double flyp = 0.012, flyi=0, flyd = 0, flyv = 0.00036, flys = 0.04;
+    //public final double flyp = 0.012, flyi=0, flyd = 0, flyv = 0.00036, flys = 0.04;
 
 
 
@@ -73,12 +67,11 @@ public class Teleop extends LinearOpMode  {
 
     public final double blockClose = 0.63, blockOpen = 0.27;
 
-    public boolean shooting = false, canShoot = false;
+
 
 //    public static final double  startX1 = -16.01 , startY1 = -55.49;
   public double  startX = 0 , startY = 0,startHeading=0;
-//    public static final double  startXred1=startX1, startYred1=startY1,startHeadingred1=-90;
-//    public static final double startXblue1=-startX1,startYbue1=-startY1 ,startHeadingblue1=90;
+
 
     private final PoseFactory p = PoseFactory.degrees();
 
@@ -202,7 +195,7 @@ public class Teleop extends LinearOpMode  {
 
         telemetry.update();
         if (recevieinfo) {
-            startPose= rbg.start(colorRed);
+            startPose= rbg.startpos(colorRed);
             recevieinfo=false;
         }
 
@@ -271,12 +264,11 @@ public class Teleop extends LinearOpMode  {
                     if(gamepad1.rightBumperWasPressed()||aligNing) {
                          aligNing=true;
                          driVeable=false;
-                         if(flooralign()) {
+                         if(align()) {
                            aligNing=false;
                            state=State.OUTTAKE;
 
                         }
-
 
                     }
 
@@ -376,43 +368,14 @@ public class Teleop extends LinearOpMode  {
 
     }
 
-    public boolean flooralign(){
+    public boolean align(){
 
-
-        double shootHeading =currentHeading%360;
-        double turnPower;
-        double error=targetHeading-shootHeading ;
-        if (Math.abs(error) > 180)
-            error =-Math.signum(error) *Math.abs(360-Math.abs(error));// change rotation direction
-
-
-//        dashboardTelemetry.addData("error",error);
-       // return drivePID.calculate(error) - Math.signum(error) * driveKs;
-
-
-
-       turnPower= drivePID.calculate(error);
-
-       turnPower+= Math.signum(turnPower) * driveKs;
-//
-        if (Math.abs(error)> 2){
-            leftFront.setPower(turnPower);
-            leftBack.setPower(turnPower);
-            rightFront.setPower(-turnPower);
-            rightBack.setPower(-turnPower);
-        }
-        else{
-            leftFront.setPower(0);
-            leftBack.setPower(0);
-            rightFront.setPower(0);
-            rightBack.setPower(0);
-            return true;
-
-        }
-
-        return false;
-
-
+        double turnp=rbg.flooralign(currentHeading,targetHeading);
+        leftFront.setPower(turnp);
+        leftBack.setPower(turnp);
+        rightFront.setPower(-turnp);
+        rightBack.setPower(-turnp);
+        return turnp==0;
     }
 
 
@@ -446,7 +409,7 @@ public class Teleop extends LinearOpMode  {
 
 
         try {
-            startHeading = (double) blackboard.get("Heading");
+            startHeading = (double) blackboard.get("H");
         }
 
         catch (NullPointerException e){
@@ -471,48 +434,13 @@ public class Teleop extends LinearOpMode  {
 
     }
 
-    public void autoAlign(){
-        double turn = mecanumPID(Math.toDegrees(pose.heading())+180,targetHeading );
-
-//        telemetry.addData("Pose angle", Math.toDegrees(pose.heading()));
-//        telemetry.addData("Target angle", targetHeading);
-//        telemetry.addData("Error gap",  targetHeading-Math.toDegrees(pose.heading()));
-//        telemetry.update();
-        if (Math.abs(targetHeading-(Math.toDegrees(pose.heading()) - 180)) > 1 ){
-            leftFront.setPower(-turn);
-            leftBack.setPower(-turn);
-            rightFront.setPower(turn);
-            rightBack.setPower(turn);
-        }
-        else{
-            leftFront.setPower(0);
-            leftBack.setPower(0);
-            rightFront.setPower(0);
-            rightBack.setPower(0);
-            rotating = false;
-            canShoot = true;
-        }
 
 
 
 
-    }
-
-    public double mecanumPID(double currentHeading, double targetHeading){
-        currentHeading +=180;
-        double error;
-        if (currentHeading - targetHeading < 180){
-            error = targetHeading-currentHeading;
-        } else{
-            error = currentHeading-targetHeading;
-        }
-
-
-        return drivePID.calculate(error) - Math.signum(error) * driveKs;
 
 
 
-    }
 
 
     public void initalize() {
@@ -608,10 +536,6 @@ public class Teleop extends LinearOpMode  {
         leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rbg. LUT_init();
-
-
-
-
     }
 
 //    public void LUT_init(){

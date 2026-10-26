@@ -4,19 +4,21 @@ package org.firstinspires.ftc.teamcode;
 import com.pedropathing.api.PoseFactory;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.math.Pose;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.controller.PIDController;
 import com.seattlesolvers.solverslib.util.InterpLUT;
 
 public class base  {// to save common data and function.
 
     public final double ticksPerDegree =113.7777; // 114.02
-    public double redGoalX = 140.86;
+    public double timerecord;
 
 
     private PIDController drivePID = new PIDController(0.015,0,0.0008);
     //   private PIDController drivePID = new PIDController(0.01,0,0.0008);
 
     public final double driveKs = 0.1;
+   public ElapsedTime basetime = new ElapsedTime();
 
     boolean rotating = false;
     InterpLUT Flylut = new InterpLUT();
@@ -75,7 +77,7 @@ public class base  {// to save common data and function.
 
 
 
-   public Pose start(boolean red){
+   public Pose startpos(boolean red){
 
     Pose st;
     if(red) st=startPosered1;
@@ -83,6 +85,25 @@ public class base  {// to save common data and function.
    return st;
 
    }
+
+
+    public double flooralign(double cheading ,double theading){
+
+
+        double shootHeading =cheading%360;
+        double turnPower=0;
+        double error=theading-shootHeading ;
+
+        if (Math.abs(error)< 2)return turnPower;
+        if (Math.abs(error) > 180) error =-Math.signum(error) *Math.abs(360-Math.abs(error));// change rotation direction
+
+        turnPower= drivePID.calculate(error);
+
+        turnPower+= Math.signum(turnPower) * driveKs;
+
+        return turnPower;
+
+    }
 
     public double flyPIDF(double currentVel, double targetVel){
         double velError = targetVel-currentVel;
@@ -97,6 +118,17 @@ public class base  {// to save common data and function.
         return pid + ff;
     }
 
+
+
+    public boolean timer(double period ) {
+
+        if (period == 0) {
+             timerecord= basetime.milliseconds();
+            return false;
+        }
+        return basetime.milliseconds() - timerecord> period;
+
+    }
 
     public double flySpeed(double dist){
         if (dist < 56.6 && dist > 20.7) {
