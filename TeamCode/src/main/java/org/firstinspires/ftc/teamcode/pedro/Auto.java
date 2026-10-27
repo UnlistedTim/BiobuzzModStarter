@@ -305,7 +305,8 @@ public class Auto extends OpMode {
                 break;
 
             case 5:
-                follow(follower,parkred1());
+                follower.follow(parkred1());
+               // follow(follower,parkred1());
                 pathState=7;
 
                 break;
