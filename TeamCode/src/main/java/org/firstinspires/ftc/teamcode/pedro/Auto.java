@@ -72,8 +72,8 @@ public class Auto extends OpMode {
 
 
     private Path parkred1(){
-        return Paths.curve(startPose, parkPosectlred1,parkPosered1);
-//        return line(startPose,parkPosered1);
+//        return Paths.curve(startPose, parkPosectlred1,parkPosered1);
+        return line(startPose,parkPosered1);
     }
 
 //    private Path parkblue1(){

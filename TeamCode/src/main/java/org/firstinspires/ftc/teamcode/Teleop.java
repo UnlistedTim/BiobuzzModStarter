@@ -81,7 +81,7 @@ public class Teleop extends LinearOpMode  {
 
     public double targetHeading = 0,currentHeading=0;
 
-    public  Pose startPose ;
+    public  Pose startPose; //red start
 
   private  Pose targetPose ;
 //    private  Pose targetPoseredl = p.of(targetXredl,targetYredl,-90);
@@ -295,9 +295,9 @@ public class Teleop extends LinearOpMode  {
 
             }
 
-            telemetry.addData("State", state);
-            telemetry.addData("Intake timer", intakeTimer);
-            telemetry.addData("Outtake timer", outtakeTimer);
+            telemetry.addData("Robot Heading", Math.toDegrees(pose.heading()));
+            telemetry.addData("Target Heading", targetHeading);
+            telemetry.addData("Robot state", state);
             telemetry.update();
 
 
@@ -338,7 +338,8 @@ public class Teleop extends LinearOpMode  {
         targetHeading = Math.toDegrees(Math.atan2(targetPose.y() - pose.y(), targetPose.x() - pose.x()))+offset;
         dist = pose.distance(targetPose);
         Hood.setPosition(rbg.flyHood(dist));
-        flyWheel.setPower(rbg.flyPIDF(flyCurrentVel,rbg.flySpeed(dist) ));
+        targetFlyVel = rbg.flySpeed(dist);
+        flyWheel.setPower(rbg.flyPIDF(flyCurrentVel,targetFlyVel));
 
 
     }
@@ -444,10 +445,10 @@ public class Teleop extends LinearOpMode  {
 
 
     public void initalize() {
-//        follower = Constants.createFollower(hardwareMap);
+
         Hw_init();
 
-        follower.setPose(startPose);
+
 //        follower.setPose(startPose);
 
 
@@ -469,6 +470,7 @@ public class Teleop extends LinearOpMode  {
         Blocker.setPosition(blockClose);
         Hood.setPosition(hoodShoot);
         Flipper.setPosition(flipperCollapse);
+        follower.setPose(startPose);
 
     }
 
@@ -536,6 +538,7 @@ public class Teleop extends LinearOpMode  {
         leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rbg. LUT_init();
+        startPose = rbg.startpos(true);
     }
 
 //    public void LUT_init(){
