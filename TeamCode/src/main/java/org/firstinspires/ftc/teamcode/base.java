@@ -126,7 +126,7 @@ public class base  {// to save common data and function.
              timerecord= basetime.milliseconds();
             return false;
         }
-        return basetime.milliseconds() - timerecord> period;
+        return basetime.milliseconds() - timerecord > period;
 
     }
 

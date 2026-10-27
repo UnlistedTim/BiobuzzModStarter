@@ -36,7 +36,6 @@ public class Auto extends OpMode {
 //    public double  startXred1=startX1,startYred1=startY1 ,startHeadingred1=-90;
 //    public double  startXblue1=-startX1,startYbue1=-startY1 ,startHeadingblue1=90;
     private double startX = -16.01 , startY = -55.49,startHeading=-90;
-    public base rbga;
     private int pathState=0;
 
     public  Pose startPose = poseFactory.of(startX,startY,-90);
@@ -58,6 +57,8 @@ public class Auto extends OpMode {
 
     private CRServo leftRoller, rightRoller;
 
+    public base rbga=new base();
+
 
 
    // private double targetX = -23+11, targetY = -70.6+55;
@@ -72,6 +73,7 @@ public class Auto extends OpMode {
 
     private Path parkred1(){
         return Paths.curve(startPose, parkPosectlred1,parkPosered1);
+//        return line(startPose,parkPosered1);
     }
 
 //    private Path parkblue1(){
@@ -92,7 +94,7 @@ public class Auto extends OpMode {
      //  Scheduler.reset();
         follower = Constants.create(hardwareMap);
         Hw_init();
-        rbga= new base();
+
 
 
 
@@ -213,7 +215,7 @@ public class Auto extends OpMode {
         autotime.reset();
         rbga.basetime.reset();
         follower.setPose(startPose);
-        follower.update();
+        pose = follower.pose();
 //        schedule(autoRoutine());
     }
 
@@ -245,10 +247,10 @@ public class Auto extends OpMode {
 
     {
         pose=follower.pose();
-        dist = pose.distance(targetPose);
+
         flyCurrentVel = flyWheel.getVelocity();
         double offset=0;
-        targetflyvel=rbga.flySpeed(dist);
+
         currentH=Math.toDegrees(pose.heading());
         if(pose.y()>0) {
             if(colorRed) targetPose = rbga.targetPoseredh;
@@ -259,6 +261,8 @@ public class Auto extends OpMode {
             if(colorRed) targetPose = rbga.targetPoseredl;
             else targetPose = rbga.targetPosebluel;
         }
+        dist = pose.distance(targetPose);
+        targetflyvel=rbga.flySpeed(dist);
         targetH = Math.toDegrees(Math.atan2(targetPose.y() - pose.y(), targetPose.x() - pose.x()))+offset;
 
         Hood.setPosition(rbga.flyHood(dist));
@@ -275,8 +279,8 @@ public class Auto extends OpMode {
             case 0:
 
 
-                intakeFront.setPower(0.7);;
-
+                intakeBack.setPower(0.7);
+                pathState = 1;
                 break;
 
 
@@ -302,11 +306,11 @@ public class Auto extends OpMode {
 
             case 5:
                 follow(follower,parkred1());
-                pathState=100;
+                pathState=7;
 
                 break;
             case 7:
-                if(!follower.isBusy())
+                if(!follower.isBusy()) pathState = 100;
                 break;
             case 9:
 
@@ -347,7 +351,7 @@ public class Auto extends OpMode {
 
             Hood = hardwareMap.get(Servo.class, "Hood");
             Blocker = hardwareMap.get(Servo.class, "Blocker");
-           // Flipper = hardwareMap.get(Servo.class, "Flipper");
+            Flipper = hardwareMap.get(Servo.class, "Flipper");
 
 
 
@@ -377,7 +381,8 @@ public class Auto extends OpMode {
             flyWheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             Flipper.setPosition(rbga.flipperCollapse);
 
-            rbga. LUT_init();
+
+            rbga.LUT_init();
         }
 
 
