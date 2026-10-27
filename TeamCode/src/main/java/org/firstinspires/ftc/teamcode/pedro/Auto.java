@@ -72,8 +72,8 @@ public class Auto extends OpMode {
 
 
     private Path parkred1(){
-//        return Paths.curve(startPose, parkPosectlred1,parkPosered1);
-        return line(startPose,parkPosered1);
+        return Paths.curve(startPose, parkPosectlred1,parkPosered1);
+       // return line()
     }
 
 //    private Path parkblue1(){
@@ -306,8 +306,10 @@ public class Auto extends OpMode {
 
             case 5:
 
-
+//                follow(follower,parkred1());
+//                follower.followpath
                 follower.follow(parkred1());
+//                if(!follower.isBusy()) pathState = 100;
                // follow(follower,parkred1());
                 pathState=7;
 
