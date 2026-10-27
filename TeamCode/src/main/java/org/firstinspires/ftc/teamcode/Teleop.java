@@ -335,7 +335,8 @@ public class Teleop extends LinearOpMode  {
             if(colorRed) targetPose = rbg.targetPoseredl;
             else targetPose = rbg.targetPosebluel;
         }
-        targetHeading = Math.toDegrees(Math.atan2(targetPose.y() - pose.y(), targetPose.x() - pose.x()))+offset;
+        targetHeading = Math.toDegrees(Math.atan2( pose.y()-targetPose.y() ,   pose.x()-targetPose.x()));
+         if(targetHeading<0) targetHeading=targetHeading+360;
         dist = pose.distance(targetPose);
         Hood.setPosition(rbg.flyHood(dist));
         targetFlyVel = rbg.flySpeed(dist);

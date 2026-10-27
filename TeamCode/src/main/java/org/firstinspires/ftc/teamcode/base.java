@@ -90,9 +90,9 @@ public class base  {// to save common data and function.
     public double flooralign(double cheading ,double theading){
 
 
-        double shootHeading =cheading%360;
+
         double turnPower=0;
-        double error=theading-shootHeading ;
+        double error=theading-cheading ;
 
         if (Math.abs(error)< 2)return turnPower;
         if (Math.abs(error) > 180) error =-Math.signum(error) *Math.abs(360-Math.abs(error));// change rotation direction
