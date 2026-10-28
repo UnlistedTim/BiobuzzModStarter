@@ -34,7 +34,7 @@ public class base  {// to save common data and function.
     public final double startXblue1=-startX1,startYbue1=-startY1 ,startHeadingblue1=90;
 
      public final PoseFactory p = PoseFactory.degrees();
-    public double targetX = -23+11, targetY = -70.6+55;
+    public double targetX = -12.3, targetY = -15;//-70.6+55
     public double targetXredl = targetX, targetYredl = targetY;
     public double targetXredh = targetX, targetYredh = -targetY;
     public double targetXbluel = -targetX, targetYbluel = targetY;
@@ -88,8 +88,6 @@ public class base  {// to save common data and function.
 
 
     public double flooralign(double cheading ,double theading){
-
-
 
         double turnPower=0;
         double error=theading-cheading ;
