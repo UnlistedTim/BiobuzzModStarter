@@ -97,11 +97,11 @@ public class ModStarterDebug extends LinearOpMode  {
 
     Telemetry dashboardTelemetry = dashboard.getTelemetry();
 
-    public double startX = -16.01, startY = -55.49;
+    public double startX = -16.01, startY = -60.89;
 
     private final PoseFactory p = PoseFactory.degrees();
 
-    public static double targetX = -23+11, targetY = -70.6+55;
+    public static double targetX = -12.3, targetY = -15;
 
     private Pose startPose = p.of(startX,startY,-90);
 

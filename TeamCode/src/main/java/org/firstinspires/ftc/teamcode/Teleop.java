@@ -39,7 +39,7 @@ import java.util.List;
 
 public class Teleop extends LinearOpMode  {
 
-    Pose pose;
+    Pose pose =  new Pose(0,0,0);
     public base rbg ;
 
     private DcMotorEx intakeBack,intakeFront, flyWheel,  leftFront, rightFront, leftBack, rightBack;
@@ -63,7 +63,7 @@ public class Teleop extends LinearOpMode  {
 
     public final double hoodCollapse = 0.38, hoodExtend = 0.28, hoodShoot = 0.35;
 
-    public final double flipperExtend = 0.38, flipperCollapse = 0.75;
+    public final double flipperExtend = 0.4, flipperCollapse = 0.75;
 
     public final double blockClose = 0.63, blockOpen = 0.27;
 
@@ -83,7 +83,7 @@ public class Teleop extends LinearOpMode  {
 
     public  Pose startPose; //red start
 
-  private  Pose targetPose ;
+  private  Pose targetPose = new Pose(0,0,0) ;
 //    private  Pose targetPoseredl = p.of(targetXredl,targetYredl,-90);
 //    private  Pose targetPoseredh = p.of(targetXredh,targetYredh,-90);
 
@@ -214,6 +214,9 @@ public class Teleop extends LinearOpMode  {
         telemetry.clearAll();
         while (opModeIsActive()) { //Main While loop
 
+            follower.update();
+            pose=follower.pose();
+
 
            if(outtakePhase) statusupdate();
            if(intakeTimer || outtakeTimer) timeraction();
@@ -253,6 +256,9 @@ public class Teleop extends LinearOpMode  {
                         outtakePhase=true;
                         state=State.ALIGN;
                     }
+
+                    if(gamepad2.right_trigger_pressed)  intakeFront.setPower(-0.9);
+                    if(gamepad2.rightTriggerWasReleased())intakeFront.setPower(0.9);
 
 
 
@@ -297,6 +303,10 @@ public class Teleop extends LinearOpMode  {
 
             telemetry.addData("Robot Heading", Math.toDegrees(pose.heading()));
             telemetry.addData("Target Heading", targetHeading);
+            telemetry.addData("Current x", pose.x());
+            telemetry.addData("Current y", pose.y());
+            telemetry.addData("Target pose x", targetPose.x());
+            telemetry.addData("Target pose y", targetPose.y());
             telemetry.addData("Robot state", state);
             telemetry.update();
 
@@ -321,8 +331,8 @@ public class Teleop extends LinearOpMode  {
     //
 
     public void statusupdate(){ //TODO
-        follower.update();
-        pose=follower.pose();
+
+
         flyCurrentVel = flyWheel.getVelocity();
        // double offset=0;
         currentHeading=Math.toDegrees(pose.heading());
@@ -341,8 +351,7 @@ public class Teleop extends LinearOpMode  {
         Hood.setPosition(rbg.flyHood(dist));
         targetFlyVel = rbg.flySpeed(dist);
         flyWheel.setPower(rbg.flyPIDF(flyCurrentVel,targetFlyVel));
-        if(gamepad2.right_trigger_pressed)  intakeFront.setPower(-0.9);
-        if(gamepad2.rightTriggerWasReleased())intakeFront.setPower(0);
+
 
 
     }
