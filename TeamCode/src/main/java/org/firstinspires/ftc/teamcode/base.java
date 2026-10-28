@@ -29,7 +29,7 @@ public class base  {// to save common data and function.
     public final double flipperExtend = 0.38, flipperCollapse = 0.75;
     public final double blockClose = 0.63, blockOpen = 0.27;
     public boolean shooting = false, canShoot = false;
-    public static final double  startX1 = -16.01 , startY1 = -55.49;
+    public static final double  startX1 = -16.01 , startY1=-60.89;// = -55.49;
     public final double  startXred1=startX1, startYred1=startY1,startHeadingred1=-90;
     public final double startXblue1=-startX1,startYbue1=-startY1 ,startHeadingblue1=90;
 
