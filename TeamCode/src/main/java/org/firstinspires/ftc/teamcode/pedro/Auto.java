@@ -49,7 +49,7 @@ public class Auto extends OpMode {
     // Poses
    // private final Pose startPose = poseFactory.of(24, 24, 0);
     private final Pose scorePose = poseFactory.of(48, 48, 90);
-    private final Pose parkPosered1 = poseFactory.of(-47, 27, -90);
+    private final Pose parkPosered1 = poseFactory.of(-53, 30, -90);
     private final Pose parkPosectlred1 = poseFactory.of(-47, -47, -90);
     private DcMotorEx intakeBack,intakeFront, flyWheel;
 
@@ -72,7 +72,7 @@ public class Auto extends OpMode {
 
 
     private Path parkred1(){
-        return Paths.curve(startPose, parkPosectlred1,parkPosered1);
+        return Paths.curve(startPose, parkPosectlred1,parkPosered1).constant(Math.toRadians(-90));
        // return line()
     }
 
@@ -257,13 +257,14 @@ public class Auto extends OpMode {
             else targetPose = rbga.targetPoseblueh;
         }
         else {
-            offset=180;
+           // offset=180;
             if(colorRed) targetPose = rbga.targetPoseredl;
             else targetPose = rbga.targetPosebluel;
         }
         dist = pose.distance(targetPose);
         targetflyvel=rbga.flySpeed(dist);
-        targetH = Math.toDegrees(Math.atan2(targetPose.y() - pose.y(), targetPose.x() - pose.x()))+offset;
+        targetH = Math.toDegrees(Math.atan2(pose.y()-targetPose.y() , pose.x()-targetPose.x() ));
+        if(targetH<0) targetH=targetH+360;
 
         Hood.setPosition(rbga.flyHood(dist));
         flyWheel.setPower(rbga.flyPIDF(flyCurrentVel,targetflyvel) );

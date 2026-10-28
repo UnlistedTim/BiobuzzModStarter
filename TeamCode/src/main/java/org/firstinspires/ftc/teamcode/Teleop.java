@@ -324,14 +324,14 @@ public class Teleop extends LinearOpMode  {
         follower.update();
         pose=follower.pose();
         flyCurrentVel = flyWheel.getVelocity();
-        double offset=0;
+       // double offset=0;
         currentHeading=Math.toDegrees(pose.heading());
         if(pose.y()>0) {
            if(colorRed) targetPose = rbg.targetPoseredh;
            else targetPose = rbg.targetPoseblueh;
         }
          else {
-             offset=180;
+           //  offset=180;
             if(colorRed) targetPose = rbg.targetPoseredl;
             else targetPose = rbg.targetPosebluel;
         }
@@ -341,6 +341,8 @@ public class Teleop extends LinearOpMode  {
         Hood.setPosition(rbg.flyHood(dist));
         targetFlyVel = rbg.flySpeed(dist);
         flyWheel.setPower(rbg.flyPIDF(flyCurrentVel,targetFlyVel));
+        if(gamepad2.right_trigger_pressed)  intakeFront.setPower(-0.9);
+        if(gamepad2.rightTriggerWasReleased())intakeFront.setPower(0);
 
 
     }
