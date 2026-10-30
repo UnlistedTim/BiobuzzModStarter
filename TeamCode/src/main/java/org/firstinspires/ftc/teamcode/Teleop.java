@@ -117,7 +117,7 @@ public class Teleop extends LinearOpMode  {
 
     double[] stoptime = new double[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-    public final int intake = 0, outtake = 1;
+    public final int intake = 0, outtake = 1,flip=2;
     public int intakestep=0;
     FtcDashboard dashboard = FtcDashboard.getInstance();
 
@@ -171,6 +171,7 @@ public class Teleop extends LinearOpMode  {
         telemetry.addLine("Gunner Right Bumper Confrim afters election");
         telemetry.addLine("*******************************************");
         telemetry.update();
+        stoptimers(0,flip);
 
         while (!isStarted() && !isStopRequested()) {
             if (gamepad1.cross) {
@@ -238,8 +239,9 @@ public class Teleop extends LinearOpMode  {
 
 
                 case INTAKE:
-                    if(gamepad2.leftBumperWasReleased()){
+                    if(gamepad2.leftBumperWasPressed()&&stoptimers(1000,flip)){
 
+                        stoptimers(0,flip);
                         flipperFlag=!flipperFlag;
                         if(flipperFlag)
                             Flipper.setPosition(flipperExtend);
