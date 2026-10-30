@@ -29,9 +29,9 @@ public class base  {// to save common data and function.
     public final double flipperExtend = 0.205, flipperCollapse = 0.5;
     public final double blockClose = 0.63, blockOpen = 0.27;
     public boolean shooting = false, canShoot = false;
-    public static final double  startX1 = -16.01 , startY1=-60.89;// = -55.49;
-    public final double  startXred1=startX1, startYred1=startY1,startHeadingred1=-90;
-    public final double startXblue1=-startX1,startYbue1=-startY1 ,startHeadingblue1=90;
+    public static final double  startX1 = -16.01 , startY1=-60.89,starH1=-90;// = -55.49;
+//    public final double  startXred1=startX1, startYred1=startY1,startHeadingred1=-90;
+//    public final double startXblue1=-startX1,startYbue1=-startY1 ,startHeadingblue1=90;
 
      public final PoseFactory p = PoseFactory.degrees();
     public double targetX = -12.3, targetY = -15;//-70.6+55
@@ -40,8 +40,8 @@ public class base  {// to save common data and function.
     public double targetXbluel = -targetX, targetYbluel = targetY;
     public double targetXblueh = -targetX, targetYblueh = -targetY;
     public double targetHeading = 0,currentHeading=0;
-    public Pose startPosered1 = p.of(startX1,startY1,-90);
-    public Pose startPoseblue1 = p.of(-startX1,-startY1,90);
+    public Pose startPosered1 = p.of(startX1,startY1,starH1);
+    public Pose startPoseblue1 = p.of(-startX1,-startY1,-starH1);
 
 
     public  Pose targetPose = p.of(targetX,targetY,-90);

@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.pedro;
 import static android.os.SystemClock.sleep;
-
 import com.pedropathing.api.Paths;
 import com.pedropathing.api.PoseFactory;
 import com.pedropathing.follower.Follower;
@@ -31,28 +30,17 @@ public class Auto extends OpMode {
     private Follower follower;
     private final PoseFactory poseFactory = PoseFactory.degrees();
     private Pose pose,targetPose;
-    private double currentH,targetH,flyCurrentVel,dist = 35.36 ,flyspeedgap=200,targetflyvel;
-    public double startX1 = -16.01 , startY1 = -55.49,startHeading1=-90;
-//    public double  startXred1=startX1,startYred1=startY1 ,startHeadingred1=-90;
-//    public double  startXblue1=-startX1,startYbue1=-startY1 ,startHeadingblue1=90;
-    private double startX = -16.01 , startY = -60.89,startHeading=-90;
+    private double currentH,targetH,flyCurrentVel,dist = 35.36 ,targetflyvel;
+
+
     private int pathState=0;
 
-    public  Pose startPose = poseFactory.of(startX,startY,-90);
-    private final  double targetX = -23+11, targetY = -70.6+55;
+
+
     ElapsedTime autotime = new ElapsedTime();
-//    public double targetXredl = targetX, targetYredl = targetY;
-//    public double targetXredh = targetX, targetYredh = -targetY;
-//    public double targetXbluel = -targetX, targetYbluel = targetY;
-//    public double targetXblueh = -targetX, targetYblueh = -targetY;
 
-    // Poses
-   // private final Pose startPose = poseFactory.of(24, 24, 0);
-    private final Pose scorePose = poseFactory.of(48, 48, 90);
-    private final Pose parkPosered1 = poseFactory.of(-53, 30, -90);
+//    private final Pose scorePose = poseFactory.of(48, 48, 90);
 
-    private final Pose startShootRed1 = poseFactory.of(-11.65, -55.6, -90);
-    private final Pose parkPosectlred1 = poseFactory.of(-47, -47, -90);
     private DcMotorEx intakeBack,intakeFront, flyWheel;
 
     private Servo Hood, Blocker, Flipper;
@@ -60,16 +48,23 @@ public class Auto extends OpMode {
     private CRServo leftRoller, rightRoller;
 
     public base rbga=new base();
+    private final Pose parkPosered1 = poseFactory.of(-53, 30, -90);
+    private final Pose parkPoseblue1 = poseFactory.of(53, -30, 90);
 
+    private final Pose startShootRed1 = poseFactory.of(-11.65, -55.6, -90);
+    private final Pose startShootBlue1 = poseFactory.of(11.65, 55.6, 90);
+    private final Pose parkPosectlred1 = poseFactory.of(-47, -47, -90);
+    private final Pose parkPosectlblue1 = poseFactory.of(47, 47, 90);
+  //  private double startX = -16.01 , startY = -60.89,startHeading=-90;
 
-
-   // private double targetX = -23+11, targetY = -70.6+55;
     public boolean recevieinfo=false,colorRed=true,configured=false,update=true;
 
+   // public  Pose startPose = poseFactory.of(startX,startY,-90);
+   public  Pose startPose ;
     // Path methods
-    private Path startToScore() {
-        return line(startPose, scorePose).constant(startPose);
-    }
+//    private Path startToScore() {
+//        return line(startPose, scorePose).constant(startPose);
+//    }
 
 
 
@@ -77,9 +72,17 @@ public class Auto extends OpMode {
         return Paths.curve(startPose, parkPosectlred1,parkPosered1).constant(Math.toRadians(-90));
        // return line()
     }
+    private Path parkblue1(){
+        return Paths.curve(startPose, parkPosectlblue1,parkPoseblue1).constant(Math.toRadians(90));
+        // return line()
+    }
 
     private Path firstShootred1(){
         return Paths.line(startPose, startShootRed1).constant(Math.toRadians(-90));
+        // return line()
+    }
+    private Path firstShootblue1(){
+        return Paths.line(startPose, startShootBlue1).constant(Math.toRadians(90));
         // return line()
     }
 
@@ -101,18 +104,12 @@ public class Auto extends OpMode {
      //  Scheduler.reset();
         follower = Constants.create(hardwareMap);
         Hw_init();
-
-
-
-
         // telemetry.addLine("Turn the camera to the shooting target");
         telemetry.addLine("Driver Cross X        ------->  Blue ");
         telemetry.addLine("Driver Circle O       ------->  Red ");
 //        telemetry.addLine("Gunner Triangle       ------->  3rd Row Auto");
 //        telemetry.addLine("Gunner Square         ------->  Non-3rd Row Auto");
         telemetry.addLine("Gunner right bumper   ------->  Confirm");
-
-
         telemetry.update();
 
     }
@@ -176,7 +173,7 @@ public class Auto extends OpMode {
         if(gamepad2.rightBumperWasPressed() && !configured){
 
             configured=true;
-           startPose=rbga.startpos(colorRed);
+
 
             //startPose=poseFactory.of(startX,startY,startHeading);
 
@@ -219,6 +216,7 @@ public class Auto extends OpMode {
 
     @Override
     public void start() {
+        startPose=rbga.startpos(colorRed);
         autotime.reset();
         rbga.basetime.reset();
         follower.setPose(startPose);
@@ -230,7 +228,7 @@ public class Auto extends OpMode {
     public void loop() {
         follower.update();
        if(update) statusup();
-        redPathupdate1();
+        Pathupdate1();
 
         //Scheduler.execute();
 
@@ -282,17 +280,15 @@ public class Auto extends OpMode {
 
 
 
-    void redPathupdate1() {
+    void Pathupdate1() {
 
         switch (pathState) {
 
             case 0:
                 
 
-                follower.follow(firstShootred1());
-
-
-
+                if(colorRed)follower.follow(firstShootred1());
+                else follower.follow(firstShootblue1());
                 intakeBack.setPower(0.7);
                 pathState = 1;
                 break;
@@ -324,7 +320,8 @@ public class Auto extends OpMode {
 
 //                follow(follower,parkred1());
 //                follower.followpath
-                follower.follow(parkred1());
+             if(colorRed)   follower.follow(parkred1());
+             else follower.follow(parkblue1());
 //                if(!follower.isBusy()) pathState = 100;
                // follow(follower,parkred1());
                 pathState=7;
@@ -358,8 +355,6 @@ public class Auto extends OpMode {
         blackboard.put("X",  follower.pose().x());
         blackboard.put("Y",  follower.pose().y());
         blackboard.put("H",  Math.toDegrees(follower.pose().heading()));
-
-
 
     }
 
@@ -401,11 +396,8 @@ public class Auto extends OpMode {
             flyWheel.setDirection(DcMotorSimple.Direction.FORWARD);
             flyWheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             Flipper.setPosition(rbga.flipperCollapse);
-
             Blocker.setPosition(rbga.blockClose);
-
             Hood.setPosition(0.335);
-
 
             rbga.LUT_init();
         }

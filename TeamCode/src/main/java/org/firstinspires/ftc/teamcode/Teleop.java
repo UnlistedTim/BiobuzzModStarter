@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import android.annotation.SuppressLint;
+import android.bluetooth.le.ScanSettings;
 
 
 import com.pedropathing.follower.Follower;
@@ -92,21 +93,21 @@ public class Teleop extends LinearOpMode  {
 
 
 
-    public double Xred = 58, Xb = Xred + 24;
+//    public double Xred = 58, Xb = Xred + 24;
+//
+//    public double Yback = 54, Yfront = Yback + 2*18;
+    //public double posex,posey;
 
-    public double Yback = 54, Yfront = Yback + 2*18;
-    public double posex,posey;
 
 
+  //  public static double blockerPos = 0.27; //0.27 up 0.63 collapse
 
-    public static double blockerPos = 0.27; //0.27 up 0.63 collapse
-
-    public final int shootVel = 1180;
+    //public final int shootVel = 1180;
     public Follower follower;
 
     public double flyCurrentVel = 0, targetFlyVel = 0;
     public boolean outtakePhase=false,timer=false,aligNing=false,driVeable=true, intakeTimer = false, outtakeTimer = false;
-    private boolean flipperFlag=false,recevieinfo=false;
+    private boolean flipperFlag=false,recevieinfo=false,intakeover=true;
 
 
 
@@ -117,6 +118,7 @@ public class Teleop extends LinearOpMode  {
     double[] stoptime = new double[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     public final int intake = 0, outtake = 1;
+    public int intakestep=0;
     FtcDashboard dashboard = FtcDashboard.getInstance();
 
     ElapsedTime runtime = new ElapsedTime();
@@ -133,7 +135,6 @@ public class Teleop extends LinearOpMode  {
         IDLE,
         INTAKE,
         ALIGN,
-        TRANS,
         OUTTAKE
     }
 
@@ -219,7 +220,7 @@ public class Teleop extends LinearOpMode  {
 
 
            if(outtakePhase) statusupdate();
-           if(intakeTimer || outtakeTimer) timeraction();
+           if( outtakeTimer) timeraction();
 
 
 
@@ -231,6 +232,7 @@ public class Teleop extends LinearOpMode  {
                     intakeBack.setPower(0.7);
                     leftRoller.setPower(0.9);
                     rightRoller.setPower(0.9);
+                    intakestep=0;
                     state = State.INTAKE;
                     break;
 
@@ -245,16 +247,11 @@ public class Teleop extends LinearOpMode  {
                     }
 
 
-                    if (gamepad2.rightBumperWasPressed()){
-                        intakeFront.setPower(-0.9);
-                        Flipper.setPosition(flipperCollapse);
-                        flipperFlag=false;
-                        leftRoller.setPower(0);
-                        rightRoller.setPower(0);
-                        intakeTimer = true;
-                        stoptimers(0,intake);
-                        outtakePhase=true;
-                        state=State.ALIGN;
+                    if (gamepad2.rightBumperWasPressed()||(!intakeover)){
+                        if(intakeover) {intakeover=false;outtakePhase=true;}
+                        if(intakedone()){state=State.ALIGN;intakeover=true;}
+
+
                     }
 
                     if(gamepad2.right_trigger_pressed)  intakeFront.setPower(-0.9);
@@ -359,13 +356,13 @@ public class Teleop extends LinearOpMode  {
     public boolean timeraction()
 
     {
-       if(intakeTimer ){
-           if (stoptimers(1000,intake)) {
-               intakeFront.setPower(0);
-               intakeTimer = false;
-               return true;
-           }
-       }
+//       if(intakeTimer ){
+//           if (stoptimers(1000,intake)) {
+//               intakeFront.setPower(0);
+//               intakeTimer = false;
+//               return true;
+//           }
+//       }
 
        if (outtakeTimer){
            if (stoptimers(1000,outtake)) {
@@ -380,6 +377,54 @@ public class Teleop extends LinearOpMode  {
        return false;
 
     }
+
+   public boolean  intakedone()
+
+   {
+       switch (intakestep) {
+
+           case 0:
+               intakeBack.setPower(-0.7);
+               // intakeFront.setPower(-0.9);
+               Flipper.setPosition(flipperCollapse);
+               flipperFlag=false;
+               leftRoller.setPower(0);
+               rightRoller.setPower(0);
+               stoptimers(0,intake);
+
+               intakestep=1;
+
+
+               break;
+
+
+           case 1:
+               if(stoptimers(500,intake)) {
+                   intakeBack.setPower(0.7);
+                   intakeFront.setPower(-0.9);
+                   intakestep=5;
+               }
+
+               break;
+
+           case 5:
+               if(stoptimers(1000,intake)) {
+
+                   intakeFront.setPower(0);
+                   intakestep=10;
+                   return true;
+
+               }
+
+              return false;
+
+
+       }
+
+    return false;
+
+   }
+
 
     public boolean align(){
 
@@ -556,7 +601,6 @@ public class Teleop extends LinearOpMode  {
         leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rbg. LUT_init();
-        startPose = rbg.startpos(true);
     }
 
 //    public void LUT_init(){
