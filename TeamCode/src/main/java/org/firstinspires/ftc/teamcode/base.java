@@ -26,7 +26,7 @@ public class base  {// to save common data and function.
     double dist = 0;
     public final double flyp = 0.012, flyi=0, flyd = 0, flyv = 0.00036, flys = 0.04;
     public final double hoodCollapse = 0.38, hoodExtend = 0.28, hoodShoot = 0.35;
-    public final double flipperExtend = 0.38, flipperCollapse = 0.75;
+    public final double flipperExtend = 0.205, flipperCollapse = 0.5;
     public final double blockClose = 0.63, blockOpen = 0.27;
     public boolean shooting = false, canShoot = false;
     public static final double  startX1 = -16.01 , startY1=-60.89;// = -55.49;
@@ -155,12 +155,19 @@ public class base  {// to save common data and function.
    public void LUT_init(){
 
 
-        Flylut.add(0 , 1000); Hoodlut.add(0 , 0.3);
-        Flylut.add(20.79 , 1090); Hoodlut.add(20.79 , 0.315);
-        Flylut.add(38.23 , 1120); Hoodlut.add(38.23 , 0.335);
-        Flylut.add(45.26,1130); Hoodlut.add(45.26,0.345);
-        Flylut.add(56.61,1180); Hoodlut.add(56.61,0.35);
-        Flylut.add(200,1250); Hoodlut.add(200,0.37);
+//        Flylut.add(0 , 1000); Hoodlut.add(0 , 0.3);
+//        Flylut.add(20.79 , 1090); Hoodlut.add(20.79 , 0.315);
+//        Flylut.add(38.23 , 1120); Hoodlut.add(38.23 , 0.335);
+//        Flylut.add(45.26,1130); Hoodlut.add(45.26,0.345);
+//        Flylut.add(56.61,1180); Hoodlut.add(56.61,0.35);
+//        Flylut.add(200,1250); Hoodlut.add(200,0.37);
+
+       Flylut.add(0 , 900); Hoodlut.add(0 , 0.31);
+       Flylut.add(27.22 , 1070); Hoodlut.add(27.22 , 0.32);
+       Flylut.add(43.955 , 1120); Hoodlut.add(43.955 , 0.338);
+       Flylut.add(59.22,1190); Hoodlut.add(59.22,0.345);
+       Flylut.add(78.38,1280); Hoodlut.add(78.38,0.38);
+       Flylut.add(200,1400); Hoodlut.add(200,0.39);
 
         Flylut.createLUT();
         Hoodlut.createLUT();

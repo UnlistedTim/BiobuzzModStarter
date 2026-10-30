@@ -57,6 +57,36 @@ import org.firstinspires.ftc.teamcode.pedro.Constants;
 
 import java.util.List;
 
+//46
+
+
+//shooting auto start x:-12.58
+//shooting auto start x:-55.79
+
+//shooting auto start x new: -11.65
+//shooting auto start Y new: -55.6 distance 35.36 flyvel 1110 ; hood 0.335
+
+
+
+
+//-----------
+
+//r = 27.22
+//fly vel 1070 hood 0.32
+
+//-----
+// r =59.22
+//fly vel 1190 hood 0.345
+//
+
+// ------
+
+// r  = 43.955 hood 0.338 ; fly vel  1120
+// -----
+// r  = 78.38 hood 0.38 flyvel 1280
+
+
+
 
 @TeleOp(name="ModStarterDebug", group="A")
 @Config
@@ -70,6 +100,8 @@ public class ModStarterDebug extends LinearOpMode  {
     private DcMotorEx intakeBack,intakeFront, Flywheel,  leftFront, rightFront, leftBack, rightBack;
 
     private Servo Hood, Blocker, Flipper;
+
+    double dist = 0;
 
     private CRServo leftRoller, rightRoller;
 
@@ -88,7 +120,7 @@ public class ModStarterDebug extends LinearOpMode  {
 
     public static double blockerPos = 0.27; //0.27 up 0.63 collapse
 
-    public static double flipperPos = 0; //0.75 up // 0.4 or 0.35 down
+    public static double flipperPos = 0.75; //0.75 up // 0.4 or 0.35 down
 
     public Follower follower;
 
@@ -174,6 +206,8 @@ public class ModStarterDebug extends LinearOpMode  {
             follower.update();
             pose=follower.pose();
 
+            dist = pose.distance(targetPose)-5.4;;
+
             targetPose = new Pose(targetX,targetY, 90);
 
             targetHeading = Math.toDegrees(Math.atan2(targetPose.y() - pose.y(), targetPose.x() - pose.x()));
@@ -188,6 +222,8 @@ public class ModStarterDebug extends LinearOpMode  {
 
             flyCurrentVel = Flywheel.getVelocity();
             Flywheel.setPower(flyPIDF(flyCurrentVel, flyVel));
+
+
 
             Hood.setPosition(hoodPos);
 
@@ -214,7 +250,7 @@ public class ModStarterDebug extends LinearOpMode  {
             dashboardTelemetry.addData("Current X", pose.x());
             dashboardTelemetry.addData("Current Y", pose.y());
             dashboardTelemetry.addData("Current theta", Math.toDegrees(pose.heading()));
-            dashboardTelemetry.addData("distance", pose.distance(targetPose));
+            dashboardTelemetry.addData("distance", dist);
 
 //            mecanumRobotCentricDrive(-gamepad1.right_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
 
