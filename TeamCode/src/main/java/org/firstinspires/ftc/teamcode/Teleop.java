@@ -110,14 +110,9 @@ public class Teleop extends LinearOpMode  {
     private boolean flipperFlag=false,recevieinfo=false,intakeover=true;
 
 
-
-
-
-
-
     double[] stoptime = new double[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-    public final int intake = 0, outtake = 1,flip=2;
+    public final int intake = 0, outtake = 1,flip=2,align=3;
     public int intakestep=0;
     FtcDashboard dashboard = FtcDashboard.getInstance();
 
@@ -225,6 +220,7 @@ public class Teleop extends LinearOpMode  {
 
 
 
+
             switch (state){
                 case IDLE:
 
@@ -247,35 +243,32 @@ public class Teleop extends LinearOpMode  {
                             Flipper.setPosition(flipperExtend);
                         else  Flipper.setPosition(flipperCollapse);
                     }
-
-
                     if (gamepad2.rightBumperWasPressed()||(!intakeover)){
                         if(intakeover) {intakeover=false;outtakePhase=true;}
                         if(intakedone()){state=State.ALIGN;intakeover=true;}
 
-
                     }
 
-                    if(gamepad2.right_trigger_pressed)  intakeFront.setPower(-0.9);
-                    if(gamepad2.rightTriggerWasReleased())intakeFront.setPower(0.9);
-
-
+                    if(gamepad1.rightBumperWasPressed()&&intakeover) {
+                        state = State.ALIGN;
+                        driVeable = false;
+                        stoptimers(0,align);
+                    }
 
                     break;
 
 
                 case ALIGN:
 
-                    if(gamepad1.rightBumperWasPressed()||aligNing) {
-                         aligNing=true;
-                         driVeable=false;
-                         if(align()) {
-                           aligNing=false;
+
+                    if(align()||stoptimers(2000,align)) {
+
                            state=State.OUTTAKE;
+                        stoptimers(0,outtake);
 
                         }
 
-                    }
+
 
                     break;
 
@@ -283,7 +276,8 @@ public class Teleop extends LinearOpMode  {
 
                 case OUTTAKE:
 
-                    if ( !driVeable && Math.abs(flyCurrentVel - targetFlyVel) <40){
+                    if ( !driVeable && (Math.abs(flyCurrentVel - targetFlyVel) <40||stoptimers(2000,outtake)))
+                    {
                       //  intakeBack.setPower(0.5);
                         Blocker.setPosition(blockOpen);
                         stoptimers(0,outtake);
@@ -380,7 +374,10 @@ public class Teleop extends LinearOpMode  {
 
     }
 
-   public boolean  intakedone()
+
+
+
+    public boolean  intakedone()
 
    {
        switch (intakestep) {
@@ -412,8 +409,8 @@ public class Teleop extends LinearOpMode  {
            case 5:
                if(stoptimers(1000,intake)) {
 
-                   intakeFront.setPower(0);
-                   intakestep=10;
+                   intakeFront.setPower(0.9);
+                   intakestep=0;
                    return true;
 
                }
