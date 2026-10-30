@@ -486,6 +486,9 @@ public class Teleop extends LinearOpMode  {
         if (startX != 0){
              startPose = p.of(startX,startY,startHeading);
         }
+        else{
+            startPose = rbg.startpos(true);
+        }
 
 //        try{
 //            Tgap = (int) blackboard.get("T");
