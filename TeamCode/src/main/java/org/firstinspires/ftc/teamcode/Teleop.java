@@ -252,6 +252,7 @@ public class Teleop extends LinearOpMode  {
                     if(gamepad1.rightBumperWasPressed()&&intakeover) {
                         state = State.ALIGN;
                         driVeable = false;
+                        outtakePhase=true;
                         stoptimers(0,align);
                     }
 
