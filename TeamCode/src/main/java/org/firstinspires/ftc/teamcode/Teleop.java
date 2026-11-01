@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode;
 import android.annotation.SuppressLint;
 import android.bluetooth.le.ScanSettings;
 
-
 import com.pedropathing.follower.Follower;
 import com.pedropathing.api.PoseFactory;
 import com.pedropathing.math.Pose;
@@ -460,6 +459,7 @@ public class Teleop extends LinearOpMode  {
 
         try {
             startY = (double) blackboard.get("Y");
+
         }
 
         catch (NullPointerException e){
