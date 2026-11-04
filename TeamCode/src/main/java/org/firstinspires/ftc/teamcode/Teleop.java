@@ -27,6 +27,7 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 
 
@@ -42,6 +43,8 @@ public class Teleop extends LinearOpMode  {
     Pose pose =  new Pose(0,0,0);
     public base rbg ;
 
+    public boolean fieldCentric = true;
+
     private DcMotorEx intakeBack,intakeFront, flyWheel,  leftFront, rightFront, leftBack, rightBack;
 
     private Servo Hood, Blocker, Flipper;
@@ -49,6 +52,8 @@ public class Teleop extends LinearOpMode  {
     private CRServo leftRoller, rightRoller;
 
     private VoltageSensor voltageSensor;
+
+    public double colorFactor = 1;
 
 
 
@@ -192,6 +197,7 @@ public class Teleop extends LinearOpMode  {
         telemetry.update();
         if (recevieinfo) {
             startPose= rbg.startpos(colorRed);
+            colorFactor = -1 + 2 * Boolean.compare(colorRed, false);
             recevieinfo=false;
         }
 
@@ -294,14 +300,19 @@ public class Teleop extends LinearOpMode  {
 
             }
 
-            telemetry.addData("Robot Heading", Math.toDegrees(pose.heading()));
-            telemetry.addData("Target Heading", targetHeading);
-            telemetry.addData("Current x", pose.x());
-            telemetry.addData("Current y", pose.y());
-            telemetry.addData("Target pose x", targetPose.x());
-            telemetry.addData("Target pose y", targetPose.y());
-            telemetry.addData("Robot state", state);
-            telemetry.update();
+            if (gamepad1.crossWasPressed()) {
+                fieldCentric = !fieldCentric;
+                gamepad1.rumble(1,1,500);
+            }
+
+//            telemetry.addData("Robot Heading", Math.toDegrees(pose.heading()));
+//            telemetry.addData("Target Heading", targetHeading);
+//            telemetry.addData("Current x", pose.x());
+//            telemetry.addData("Current y", pose.y());
+//            telemetry.addData("Target pose x", targetPose.x());
+//            telemetry.addData("Target pose y", targetPose.y());
+//            telemetry.addData("Robot state", state);
+//            telemetry.update();
 
 
 //            dashboardTelemetry.addData("Current X", pose.x());
@@ -310,7 +321,10 @@ public class Teleop extends LinearOpMode  {
 //            dashboardTelemetry.addData("distance", pose.distance(targetPose));
 //            dashboardTelemetry.update();
 
-            if(driVeable)mecanumRobotCentricDrive(-gamepad1.right_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
+            if(driVeable){
+                if (fieldCentric) mecanumRobotDrive(-gamepad1.right_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
+                else mecanumRobotCentricDrive(-gamepad1.right_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
+            }
 
 
 
@@ -686,6 +700,47 @@ public class Teleop extends LinearOpMode  {
         double backLeftPower = (y - x + rx) / denominator;
         double frontRightPower = (y - x - rx) / denominator;
         double backRightPower = (y + x - rx) / denominator;
+
+        leftFront.setPower(frontLeftPower);
+        leftBack.setPower(backLeftPower);
+        rightFront.setPower(frontRightPower);
+        rightBack.setPower(backRightPower);
+
+        //   telemetry.addData("Angle", pose.getHeading(AngleUnit.DEGREES));
+//        telemetry.addData("X", pose.getX(DistanceUnit.INCH));
+//        telemetry.addData("Y", pose.getY(DistanceUnit.INCH));
+
+
+
+        //  telemetry.update();
+    }
+
+    public void mecanumRobotDrive(double y, double x, double rx){
+
+        y*= colorFactor;
+        x*=colorFactor;
+
+
+//        y*= colorFactor;
+//        x*=colorFactor;
+
+
+        // Denominator is the largest motor power (absolute value) or 1
+        // This ensures all the powers maintain the same ratio,
+        // but only if at least one is out of the range [-1, 1]
+
+        double botHeading = pose.heading();
+
+        // Rotate the movement direction counter to the bot's rotation
+        double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
+        double rotY = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
+
+        rotX = rotX * 1.1;  // Counteract imperfect strafing
+        double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
+        double frontLeftPower = (rotY + rotX + rx) / denominator;
+        double backLeftPower = (rotY - rotX + rx) / denominator;
+        double frontRightPower = (rotY - rotX - rx) / denominator;
+        double backRightPower = (rotY + rotX - rx) / denominator;
 
         leftFront.setPower(frontLeftPower);
         leftBack.setPower(backLeftPower);
