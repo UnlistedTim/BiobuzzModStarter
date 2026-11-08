@@ -68,7 +68,7 @@ public class Teleop extends LinearOpMode  {
 
     public final double hoodCollapse = 0.38, hoodExtend = 0.28, hoodShoot = 0.35;
 
-    public final double flipperExtend = 0.205, flipperCollapse = 0.5;
+    public final double flipperExtend = 0.08, flipperCollapse = 0.5;
 
     public final double blockClose = 0.63, blockOpen = 0.27;
 
