@@ -230,7 +230,7 @@ public class Teleop extends LinearOpMode  {
                 case IDLE:
 
                     flyWheel.setPower(0.4);
-                    intakeFront.setPower(0.9);
+                    intakeFront.setPower(0.7);
                     intakeBack.setPower(0.7);
                     leftRoller.setPower(0.9);
                     rightRoller.setPower(0.9);
@@ -423,7 +423,7 @@ public class Teleop extends LinearOpMode  {
            case 5:
                if(stoptimers(1000,intake)) {
 
-                   intakeFront.setPower(0.9);
+                   intakeFront.setPower(0.7);
                    intakestep=0;
                    return true;
 
