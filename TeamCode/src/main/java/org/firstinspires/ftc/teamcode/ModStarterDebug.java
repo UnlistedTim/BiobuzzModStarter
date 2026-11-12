@@ -120,7 +120,7 @@ public class ModStarterDebug extends LinearOpMode  {
 
     public static double blockerPos = 0.27; //0.27 up 0.63 collapse
 
-    public static double flipperPos = 0.75; //0.75 up // 0.4 or 0.35 down
+    public static double flipperPos = 0.45; //0.75 up // 0.4 or 0.35 down
 
     public Follower follower;
 

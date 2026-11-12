@@ -68,7 +68,7 @@ public class Teleop extends LinearOpMode  {
 
     public final double hoodCollapse = 0.38, hoodExtend = 0.28, hoodShoot = 0.35;
 
-    public final double flipperExtend = 0.08, flipperCollapse = 0.5;
+    public final double flipperExtend = 0.07, flipperCollapse = 0.45;
 
     public final double blockClose = 0.63, blockOpen = 0.27;
 
@@ -232,8 +232,8 @@ public class Teleop extends LinearOpMode  {
                     flyWheel.setPower(0.4);
                     intakeFront.setPower(0.7);
                     intakeBack.setPower(0.7);
-                    leftRoller.setPower(0.9);
-                    rightRoller.setPower(0.9);
+//                    leftRoller.setPower(0.9);
+//                    rightRoller.setPower(0.9);
                     intakestep=0;
                     state = State.INTAKE;
                     break;
@@ -401,8 +401,8 @@ public class Teleop extends LinearOpMode  {
                // intakeFront.setPower(-0.9);
                Flipper.setPosition(flipperCollapse);
                flipperFlag=false;
-               leftRoller.setPower(0);
-               rightRoller.setPower(0);
+//               leftRoller.setPower(0);
+//               rightRoller.setPower(0);
                stoptimers(0,intake);
 
                intakestep=1;
@@ -570,8 +570,8 @@ public class Teleop extends LinearOpMode  {
         flyWheel = hardwareMap.get(DcMotorEx.class, "Flywheel");
         follower = Constants.create(hardwareMap);
 
-        leftRoller = hardwareMap.get(CRServo.class, "leftRoller");
-        rightRoller = hardwareMap.get(CRServo.class,"rightRoller");
+//        leftRoller = hardwareMap.get(CRServo.class, "leftRoller");
+//        rightRoller = hardwareMap.get(CRServo.class,"rightRoller");
 
         Hood = hardwareMap.get(Servo.class, "Hood");
         Blocker = hardwareMap.get(Servo.class, "Blocker");
