@@ -56,11 +56,6 @@ public class Teleop extends LinearOpMode  {
     public double colorFactor = 1;
 
 
-
-
-
-
-
     double dist = 0;
     //public final double flyp = 0.012, flyi=0, flyd = 0, flyv = 0.00036, flys = 0.04;
 
@@ -68,13 +63,8 @@ public class Teleop extends LinearOpMode  {
 
     public final double hoodCollapse = 0.38, hoodExtend = 0.28, hoodShoot = 0.35;
 
-<<<<<<< Updated upstream
-    public final double flipperExtend = 0.07, flipperCollapse = 0.45;
-=======
-   // public final double flipperExtend = 0.08, flipperCollapse = 0.5;
->>>>>>> Stashed changes
 
-    public final double blockClose = 0.63, blockOpen = 0.27;
+//    public final double blockClose = 0.63, blockOpen = 0.27;
 
 
 
@@ -289,7 +279,7 @@ public class Teleop extends LinearOpMode  {
                     if ( !driVeable && (Math.abs(flyCurrentVel - targetFlyVel) <40||stoptimers(2000,outtake)))
                     {
                       //  intakeBack.setPower(0.5);
-                        Blocker.setPosition(blockOpen);
+                        Blocker.setPosition(rbg.blockOpen);
                         stoptimers(0,outtake);
                         outtakeTimer = true;//
                         driVeable=true;
@@ -380,7 +370,7 @@ public class Teleop extends LinearOpMode  {
 
        if (outtakeTimer){
            if (stoptimers(1000,outtake)) {
-               Blocker.setPosition(blockClose);
+               Blocker.setPosition(rbg.blockClose);
                outtakeTimer = false;
                return true;
            }
@@ -551,7 +541,7 @@ public class Teleop extends LinearOpMode  {
 
         pose = follower.pose();
         runtime.reset();
-        Blocker.setPosition(blockClose);
+        Blocker.setPosition(rbg.blockClose);
         Hood.setPosition(hoodShoot);
         Flipper.setPosition(rbg.flipperCollapse);
         follower.setPose(startPose);

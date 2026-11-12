@@ -26,13 +26,13 @@ public class base  {// to save common data and function.
     double dist = 0;
     public final double flyp = 0.012, flyi=0, flyd = 0, flyv = 0.00036, flys = 0.04;
     public final double hoodCollapse = 0.38, hoodExtend = 0.28, hoodShoot = 0.35;
-<<<<<<< Updated upstream
-    public final double flipperExtend = 0.07, flipperCollapse = 0.45;
-=======
-    public final double flipperExtend = 0.08, flipperCollapse = 0.5;
 
->>>>>>> Stashed changes
-    public final double blockClose = 0.63, blockOpen = 0.27;
+    public final double flipperExtend = 0.07, flipperCollapse = 0.45;
+
+//    public final double flipperExtend = 0.08, flipperCollapse = 0.5;
+
+
+   public final double blockClose = 0.63, blockOpen = 0.27;
     public boolean shooting = false, canShoot = false;
     public static final double  startX1 = -16.01 , startY1=-60.89,starH1=-90;// = -55.49;
 //    public final double  startXred1=startX1, startYred1=startY1,startHeadingred1=-90;
