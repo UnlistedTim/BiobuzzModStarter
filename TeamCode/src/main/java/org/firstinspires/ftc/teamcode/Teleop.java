@@ -68,7 +68,11 @@ public class Teleop extends LinearOpMode  {
 
     public final double hoodCollapse = 0.38, hoodExtend = 0.28, hoodShoot = 0.35;
 
+<<<<<<< Updated upstream
     public final double flipperExtend = 0.07, flipperCollapse = 0.45;
+=======
+   // public final double flipperExtend = 0.08, flipperCollapse = 0.5;
+>>>>>>> Stashed changes
 
     public final double blockClose = 0.63, blockOpen = 0.27;
 
@@ -245,8 +249,8 @@ public class Teleop extends LinearOpMode  {
                         stoptimers(0,flip);
                         flipperFlag=!flipperFlag;
                         if(flipperFlag)
-                            Flipper.setPosition(flipperExtend);
-                        else  Flipper.setPosition(flipperCollapse);
+                            Flipper.setPosition(rbg.flipperExtend);
+                        else  Flipper.setPosition(rbg.flipperCollapse);
                     }
                     if (gamepad2.rightBumperWasPressed()||(!intakeover)){
                         if(intakeover) {intakeover=false;outtakePhase=true;}
@@ -399,7 +403,7 @@ public class Teleop extends LinearOpMode  {
            case 0:
                intakeBack.setPower(-0.7);
                // intakeFront.setPower(-0.9);
-               Flipper.setPosition(flipperCollapse);
+               Flipper.setPosition(rbg.flipperCollapse);
                flipperFlag=false;
 //               leftRoller.setPower(0);
 //               rightRoller.setPower(0);
@@ -549,7 +553,7 @@ public class Teleop extends LinearOpMode  {
         runtime.reset();
         Blocker.setPosition(blockClose);
         Hood.setPosition(hoodShoot);
-        Flipper.setPosition(flipperCollapse);
+        Flipper.setPosition(rbg.flipperCollapse);
         follower.setPose(startPose);
 
     }
