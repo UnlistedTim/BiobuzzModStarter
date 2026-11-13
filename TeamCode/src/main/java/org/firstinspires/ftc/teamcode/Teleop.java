@@ -312,6 +312,7 @@ public class Teleop extends LinearOpMode  {
                         state=State.IDLE;
                         driVeable=true;
                         shooting=false;
+                        Blocker.setPosition(rbg.blockClose);
                     }
 
                     break;
@@ -392,14 +393,14 @@ public class Teleop extends LinearOpMode  {
 //           }
 //       }
 
-       if (outtakeTimer){
-           if (stoptimers(1000,outtake)) {
-               Blocker.setPosition(rbg.blockClose);
-               outtakeTimer = false;
-               return true;
-           }
-
-       }
+//       if (outtakeTimer){
+//           if (stoptimers(1000,outtake)) {
+//               Blocker.setPosition(rbg.blockClose);
+//               outtakeTimer = false;
+//               return true;
+//           }
+//
+//       }
 
 
        return false;
