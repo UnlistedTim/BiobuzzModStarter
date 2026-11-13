@@ -49,7 +49,6 @@ public class Teleop extends LinearOpMode  {
 
     private Servo Hood, Blocker, Flipper;
 
-    private CRServo leftRoller, rightRoller;
 
     private VoltageSensor voltageSensor;
 
@@ -595,8 +594,7 @@ public class Teleop extends LinearOpMode  {
         intakeFront.setDirection(DcMotorSimple.Direction.FORWARD);
         intakeBack.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        leftRoller.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightRoller.setDirection(DcMotorSimple.Direction.FORWARD);
+
 
 
         flyWheel.setDirection(DcMotorSimple.Direction.FORWARD);

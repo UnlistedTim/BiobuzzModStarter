@@ -39,7 +39,7 @@ public class AutoMeet2 extends OpMode {
 
     private Servo Hood, Blocker, Flipper;
 
-    private CRServo leftRoller, rightRoller;
+//    private CRServo leftRoller, rightRoller;
 
     public base rbga=new base();
     private final Pose parkRed1 = poseFactory.of(-50, 20, -90);
@@ -566,8 +566,8 @@ public class AutoMeet2 extends OpMode {
 
             flyWheel = hardwareMap.get(DcMotorEx.class, "Flywheel");
 
-            leftRoller = hardwareMap.get(CRServo.class, "leftRoller");
-            rightRoller = hardwareMap.get(CRServo.class,"rightRoller");
+//            leftRoller = hardwareMap.get(CRServo.class, "leftRoller");
+//            rightRoller = hardwareMap.get(CRServo.class,"rightRoller");
 
             Hood = hardwareMap.get(Servo.class, "Hood");
             Blocker = hardwareMap.get(Servo.class, "Blocker");
