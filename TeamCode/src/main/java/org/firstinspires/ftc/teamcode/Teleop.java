@@ -50,6 +50,8 @@ public class Teleop extends LinearOpMode  {
     private Servo Hood, Blocker, Flipper;
 
 
+
+
     private VoltageSensor voltageSensor;
 
     public double colorFactor = 1;
@@ -104,12 +106,12 @@ public class Teleop extends LinearOpMode  {
 
     public double flyCurrentVel = 0, targetFlyVel = 0;
     public boolean outtakePhase=false,timer=false,aligNing=false,driVeable=true, intakeTimer = false, outtakeTimer = false;
-    private boolean flipperFlag=false,recevieinfo=false,intakeover=true;
+    private boolean flipperFlag=false,recevieinfo=false,intakejam=false,shooting=false,reversing=false;
 
 
     double[] stoptime = new double[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-    public final int intake = 0, outtake = 1,flip=2,align=3;
+    public final int intake = 0, outtake = 1,flip=2,align=3,reverse=4;
     public int intakestep=0;
     FtcDashboard dashboard = FtcDashboard.getInstance();
 
@@ -215,6 +217,11 @@ public class Teleop extends LinearOpMode  {
 
            if(outtakePhase) statusupdate();
            if( outtakeTimer) timeraction();
+           if (gamepad2.rightBumperWasPressed()||(intakejam)){
+                if(!intakejam) {intakejam=true;}
+                if(intakejam()){intakejam=false;}
+
+            }
 
 
 
@@ -241,17 +248,18 @@ public class Teleop extends LinearOpMode  {
                             Flipper.setPosition(rbg.flipperExtend);
                         else  Flipper.setPosition(rbg.flipperCollapse);
                     }
-                    if (gamepad2.rightBumperWasPressed()||(!intakeover)){
-                        if(intakeover) {intakeover=false;outtakePhase=true;}
-                        if(intakedone()){state=State.ALIGN;intakeover=true;}
 
-                    }
 
-                    if(gamepad1.rightBumperWasPressed()&&intakeover) {
+                    if(gamepad1.rightBumperWasPressed()) {
                         state = State.ALIGN;
                         driVeable = false;
                         outtakePhase=true;
                         stoptimers(0,align);
+                    }
+
+                    if(gamepad1.left_bumper){
+                        intakeBack.setPower(0.7);
+
                     }
 
                     break;
@@ -263,7 +271,8 @@ public class Teleop extends LinearOpMode  {
                     if(align()||stoptimers(2000,align)) {
 
                            state=State.OUTTAKE;
-                        stoptimers(0,outtake);
+                           intakeBack.setPower(-0.7);
+                      //  stoptimers(0,outtake);
 
                         }
 
@@ -280,13 +289,29 @@ public class Teleop extends LinearOpMode  {
                       //  intakeBack.setPower(0.5);
                         Blocker.setPosition(rbg.blockOpen);
                         stoptimers(0,outtake);
-                        outtakeTimer = true;//
-                        driVeable=true;
-
+                        shooting = true;//
+                        intakeBack.setPower(0.7);
                     }
-                    if(driVeable&&!outtakeTimer) {
+                     if(shooting) {
+                         if(gamepad1.left_bumper&&!reversing) {
+                             stoptimers(0,reverse);
+                             reversing=true;
+                             intakeBack.setPower(-0.8);
+                         }
+                         if(reversing&&stoptimers(600,reverse)) {
+                             intakeBack.setPower(0.7);
+                             reversing=false;
+                         }
+
+
+
+                     }
+
+                    if(shooting&&Math.abs(gamepad1.right_stick_y)>0.18) {
                         outtakePhase=false;
                         state=State.IDLE;
+                        driVeable=true;
+                        shooting=false;
                     }
 
                     break;
@@ -384,50 +409,47 @@ public class Teleop extends LinearOpMode  {
 
 
 
-    public boolean  intakedone()
+    public boolean  intakejam()
 
    {
        switch (intakestep) {
 
            case 0:
                intakeBack.setPower(-0.7);
-               // intakeFront.setPower(-0.9);
-               Flipper.setPosition(rbg.flipperCollapse);
-               flipperFlag=false;
-//               leftRoller.setPower(0);
-//               rightRoller.setPower(0);
+               intakeBack.setPower(-0.9);
                stoptimers(0,intake);
 
-               intakestep=1;
+               intakestep=5;
 
 
                break;
 
 
            case 1:
-               if(stoptimers(500,intake)) {
+               if(stoptimers(1000,intake)) {
                    intakeBack.setPower(0.7);
-                   intakeFront.setPower(-0.9);
+                  intakeFront.setPower(0.9);
+                   intakestep=0;
                    intakestep=5;
+                   return true;
                }
+
+
+
 
                break;
 
-           case 5:
-               if(stoptimers(1000,intake)) {
 
-                   intakeFront.setPower(0.7);
-                   intakestep=0;
-                   return true;
+
 
                }
 
-              return false;
+
+       return false;
 
 
-       }
 
-    return false;
+
 
    }
 
