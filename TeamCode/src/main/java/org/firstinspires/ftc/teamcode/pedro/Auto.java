@@ -48,8 +48,8 @@ public class Auto extends OpMode {
     private CRServo leftRoller, rightRoller;
 
     public base rbga=new base();
-    private final Pose parkPosered1 = poseFactory.of(-53, 30, -90);
-    private final Pose parkPoseblue1 = poseFactory.of(53, -30, 90);
+    private final Pose parkPosered1 = poseFactory.of(-53, 22, -90);
+    private final Pose parkPoseblue1 = poseFactory.of(53, -22, 90);
 
     private final Pose startShootRed1 = poseFactory.of(-11.65, -55.6, -90);
     private final Pose startShootBlue1 = poseFactory.of(11.65, 55.6, 90);
@@ -289,7 +289,7 @@ public class Auto extends OpMode {
 
                 if(colorRed)follower.follow(firstShootred1());
                 else follower.follow(firstShootblue1());
-                intakeBack.setPower(0.7);
+//                intakeBack.setPower(0.7);
                 pathState = 1;
                 break;
 
@@ -302,21 +302,41 @@ public class Auto extends OpMode {
 
                 if(shoot()) {
                     rbga.timer(0);
+                    intakeFront.setPower(0.9);
+                    intakeBack.setPower(0.7);
                     pathState=3;
                 }
 
                 break;
             case 3:
-                if(rbga.timer(1500)) {
+
+                if(rbga.timer(1500)){
+                    intakeBack.setPower(-0.8);
+                    pathState=4;
+
+                }
+                break;
+
+            case 4:
+
+                if(rbga.timer(2200)) {
+                    intakeBack.setPower(0.8);
+                    pathState = 5;
+                }
+                break;
+
+
+            case 5:
+                if(rbga.timer(7000)) {
                     flyWheel.setPower(0);
                     intakeFront.setPower(0);
                     intakeBack.setPower(0);
                     update=false;
-                    pathState=5;
+                    pathState=6;
                 }
                 break;
 
-            case 5:
+            case 6:
 
 //                follow(follower,parkred1());
 //                follower.followpath
@@ -340,6 +360,7 @@ public class Auto extends OpMode {
                 sleep(500);
                 autosave();
                 pathState=110;
+                break;
             case 110:
                 break;
 
