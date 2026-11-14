@@ -217,7 +217,7 @@ public class Teleop extends LinearOpMode  {
 
            if(outtakePhase) statusupdate();
            if( outtakeTimer) timeraction();
-           if (gamepad2.rightBumperWasPressed()||(intakejam)){
+           if (gamepad2.rightBumperWasPressed()||intakejam){
                 if(!intakejam) {intakejam=true;}
                 if(intakejam()){intakejam=false;}
 
@@ -257,10 +257,10 @@ public class Teleop extends LinearOpMode  {
                         stoptimers(0,align);
                     }
 
-                    if(gamepad1.left_bumper){
-                        intakeBack.setPower(0.7);
-
-                    }
+//                    if(gamepad1.left_bumper){
+//                        intakeBack.setPower(0.7);
+//
+//                    }
 
                     break;
 
@@ -284,7 +284,7 @@ public class Teleop extends LinearOpMode  {
 
                 case OUTTAKE:
 
-                    if ( !driVeable && (Math.abs(flyCurrentVel - targetFlyVel) <40||stoptimers(2000,outtake)))
+                    if ( !shooting && (Math.abs(flyCurrentVel - targetFlyVel) <40||stoptimers(2000,outtake)))
                     {
                       //  intakeBack.setPower(0.5);
                         Blocker.setPosition(rbg.blockOpen);
@@ -307,7 +307,7 @@ public class Teleop extends LinearOpMode  {
 
                      }
 
-                    if(shooting&&Math.abs(gamepad1.right_stick_y)>0.18) {
+                    if(shooting&&(Math.abs(gamepad1.right_stick_y)>0.18 || Math.abs(gamepad1.right_stick_x) > 0.18)) {
                         outtakePhase=false;
                         state=State.IDLE;
                         driVeable=true;
@@ -416,11 +416,11 @@ public class Teleop extends LinearOpMode  {
        switch (intakestep) {
 
            case 0:
-               intakeBack.setPower(-0.7);
-               intakeBack.setPower(-0.9);
+              // intakeBack.setPower(-0.7);
+               intakeFront.setPower(-0.9);
                stoptimers(0,intake);
 
-               intakestep=5;
+               intakestep=1;
 
 
                break;
@@ -428,10 +428,10 @@ public class Teleop extends LinearOpMode  {
 
            case 1:
                if(stoptimers(1000,intake)) {
-                   intakeBack.setPower(0.7);
+                  // intakeBack.setPower(0.7);
                   intakeFront.setPower(0.9);
                    intakestep=0;
-                   intakestep=5;
+                   //intakestep=5;
                    return true;
                }
 
