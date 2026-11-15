@@ -324,10 +324,12 @@ public class Teleop extends LinearOpMode  {
                 gamepad1.rumble(1,1,500);
             }
 
-//            telemetry.addData("Robot Heading", Math.toDegrees(pose.heading()));
+            telemetry.addData("Robot Heading", Math.toDegrees(pose.heading()));
 //            telemetry.addData("Target Heading", targetHeading);
-//            telemetry.addData("Current x", pose.x());
-//            telemetry.addData("Current y", pose.y());
+            telemetry.addData("Current x", pose.x());
+            telemetry.addData("Current y", pose.y());
+
+            telemetry.update();
 //            telemetry.addData("Target pose x", targetPose.x());
 //            telemetry.addData("Target pose y", targetPose.y());
 //            telemetry.addData("Robot state", state);
