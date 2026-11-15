@@ -26,11 +26,6 @@ import android.annotation.SuppressLint;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
-
-
-//import com.pedropathing.geometry.Pose;
-//import com.pedropathing.paths.PathChain;
-
 import com.pedropathing.api.PoseFactory;
 import com.pedropathing.math.Pose;
 import com.pedropathing.api.PoseFactory;
