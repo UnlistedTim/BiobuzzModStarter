@@ -69,11 +69,11 @@ public class Auto extends OpMode {
 
 
     private Path parkred1(){
-        return Paths.curve(startPose, parkPosectlred1,parkPosered1).constant(Math.toRadians(-90));
+        return Paths.curve( startShootRed1, parkPosectlred1,parkPosered1).constant(Math.toRadians(-90));
        // return line()
     }
     private Path parkblue1(){
-        return Paths.curve(startPose, parkPosectlblue1,parkPoseblue1).constant(Math.toRadians(90));
+        return Paths.curve(startShootBlue1, parkPosectlblue1,parkPoseblue1).constant(Math.toRadians(90));
         // return line()
     }
 
