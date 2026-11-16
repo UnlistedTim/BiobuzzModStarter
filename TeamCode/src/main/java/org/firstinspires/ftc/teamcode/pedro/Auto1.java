@@ -26,7 +26,7 @@ import org.firstinspires.ftc.teamcode.base;
 
 
 @Autonomous
-public class Auto extends OpMode {
+public class Auto1 extends OpMode {
     private Follower follower;
     private final PoseFactory poseFactory = PoseFactory.degrees();
     private Pose pose,targetPose;
@@ -45,7 +45,7 @@ public class Auto extends OpMode {
 
     private Servo Hood, Blocker, Flipper;
 
-    private CRServo leftRoller, rightRoller;
+
 
     public base rbga=new base();
     private final Pose parkPosered1 = poseFactory.of(-53, 22, -90);
@@ -57,7 +57,7 @@ public class Auto extends OpMode {
     private final Pose parkPosectlblue1 = poseFactory.of(47, 47, 90);
   //  private double startX = -16.01 , startY = -60.89,startHeading=-90;
 
-    public boolean recevieinfo=false,colorRed=true,configured=false,update=true;
+    public boolean recevieinfo=false,colorRed=true,configured=false,update=true,manual=false;
 
    // public  Pose startPose = poseFactory.of(startX,startY,-90);
    public  Pose startPose ;
@@ -226,7 +226,8 @@ public class Auto extends OpMode {
 
     @Override
     public void loop() {
-        follower.update();
+        if(!manual)follower.update();
+        else follower.localizer.update();
        if(update) statusup();
         Pathupdate1();
 
@@ -254,8 +255,6 @@ public class Auto extends OpMode {
         pose=follower.pose();
 
         flyCurrentVel = flyWheel.getVelocity();
-        double offset=0;
-
         currentH=Math.toDegrees(pose.heading());
         if(pose.y()>0) {
             if(colorRed) targetPose = rbga.targetPoseredh;
@@ -267,8 +266,6 @@ public class Auto extends OpMode {
             else targetPose = rbga.targetPosebluel;
         }
         if (dist == 0) dist = pose.distance(targetPose);
-
-
         targetflyvel=rbga.flySpeed(dist);
         targetH = Math.toDegrees(Math.atan2(pose.y()-targetPose.y() , pose.x()-targetPose.x() ));
         if(targetH<0) targetH=targetH+360;
@@ -348,7 +345,14 @@ public class Auto extends OpMode {
 
                 break;
             case 7:
-                if(!follower.isBusy()) pathState = 100;
+                if(!follower.isBusy()) {
+                    pathState = 100;
+                    follower.manual(0,0,0);
+                    manual=true;
+                    rbga.timer(0);
+
+                }
+
                 break;
             case 9:
 
@@ -357,7 +361,7 @@ public class Auto extends OpMode {
 
                 break;
             case 100:
-                sleep(500);
+                if(rbga.timer(1000))
                 autosave();
                 pathState=110;
                 break;
@@ -382,9 +386,6 @@ public class Auto extends OpMode {
      void Hw_init() {
 
             flyWheel = hardwareMap.get(DcMotorEx.class, "Flywheel");
-
-            leftRoller = hardwareMap.get(CRServo.class, "leftRoller");
-            rightRoller = hardwareMap.get(CRServo.class,"rightRoller");
 
             Hood = hardwareMap.get(Servo.class, "Hood");
             Blocker = hardwareMap.get(Servo.class, "Blocker");
@@ -419,7 +420,6 @@ public class Auto extends OpMode {
             Flipper.setPosition(rbga.flipperCollapse);
             Blocker.setPosition(rbga.blockClose);
             Hood.setPosition(0.335);
-
             rbga.LUT_init();
         }
 

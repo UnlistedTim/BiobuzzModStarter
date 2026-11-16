@@ -34,7 +34,7 @@ import org.firstinspires.ftc.teamcode.pedro.Constants;
 import java.util.List;
 
 
-@TeleOp(name="ModStarterTeleop", group="A")
+@TeleOp(name="Teleop", group="A")
 @Config
 
 
@@ -52,30 +52,30 @@ public class Teleop extends LinearOpMode  {
 
 
 
-    private VoltageSensor voltageSensor;
+   // private VoltageSensor voltageSensor;
 
     public double colorFactor = 1;
 
 
     double dist = 0;
-    //public final double flyp = 0.012, flyi=0, flyd = 0, flyv = 0.00036, flys = 0.04;
+
 
 
 
     public final double hoodCollapse = 0.38, hoodExtend = 0.28, hoodShoot = 0.35;
 
 
-//    public final double blockClose = 0.63, blockOpen = 0.27;
 
 
 
-//    public static final double  startX1 = -16.01 , startY1 = -55.49;
+
+
   public double  startX = 0 , startY = 0,startHeading=0;
 
 
     private final PoseFactory p = PoseFactory.degrees();
 
-//    public double targetX = -23+11, targetY = -70.6+55;
+
 
 
 
@@ -84,24 +84,10 @@ public class Teleop extends LinearOpMode  {
     public  Pose startPose; //red start
 
   private  Pose targetPose = new Pose(0,0,0) ;
-//    private  Pose targetPoseredl = p.of(targetXredl,targetYredl,-90);
-//    private  Pose targetPoseredh = p.of(targetXredh,targetYredh,-90);
 
     public boolean colorRed=true;
 
 
-
-
-//    public double Xred = 58, Xb = Xred + 24;
-//
-//    public double Yback = 54, Yfront = Yback + 2*18;
-    //public double posex,posey;
-
-
-
-  //  public static double blockerPos = 0.27; //0.27 up 0.63 collapse
-
-    //public final int shootVel = 1180;
     public Follower follower;
 
     public double flyCurrentVel = 0, targetFlyVel = 0;
@@ -216,7 +202,7 @@ public class Teleop extends LinearOpMode  {
 
 
            if(outtakePhase) statusupdate();
-           if( outtakeTimer) timeraction();
+          // if( outtakeTimer) timeraction();
            if (gamepad2.rightBumperWasPressed()||intakejam){
                 if(!intakejam) {intakejam=true;}
                 if(intakejam()){intakejam=false;}
@@ -362,18 +348,17 @@ public class Teleop extends LinearOpMode  {
 
 
         flyCurrentVel = flyWheel.getVelocity();
-       // double offset=0;
         currentHeading=Math.toDegrees(pose.heading());
         if(pose.y()>0) {
            if(colorRed) targetPose = rbg.targetPoseredh;
            else targetPose = rbg.targetPoseblueh;
         }
          else {
-           //  offset=180;
+
             if(colorRed) targetPose = rbg.targetPoseredl;
             else targetPose = rbg.targetPosebluel;
         }
-        targetHeading = Math.toDegrees(Math.atan2( pose.y()-targetPose.y() ,   pose.x()-targetPose.x()));
+        targetHeading = Math.toDegrees(Math.atan2( pose.y()-targetPose.y() , pose.x()-targetPose.x()));
          if(targetHeading<0) targetHeading=targetHeading+360;
         dist = pose.distance(targetPose)-5.4;
         Hood.setPosition(rbg.flyHood(dist));
@@ -600,7 +585,7 @@ public class Teleop extends LinearOpMode  {
         intakeFront = hardwareMap.get(DcMotorEx.class,"intakeFront");
         intakeBack = hardwareMap.get(DcMotorEx.class,"intakeBack");
 
-        voltageSensor = hardwareMap.voltageSensor.iterator().next();
+       // voltageSensor = hardwareMap.voltageSensor.iterator().next();
 
 
       //  turretPosition=hardwareMap.get(DcMotorEx.class, "leftFront");

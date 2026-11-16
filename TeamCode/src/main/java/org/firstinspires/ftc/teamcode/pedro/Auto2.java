@@ -20,7 +20,7 @@ import org.firstinspires.ftc.teamcode.base;
 
 
 @Autonomous
-public class AutoMeet2 extends OpMode {
+public class Auto2 extends OpMode {
     private Follower follower;
     private final PoseFactory poseFactory = PoseFactory.degrees();
     private Pose pose,targetPose;
@@ -63,14 +63,10 @@ public class AutoMeet2 extends OpMode {
 
     //  private double startX = -16.01 , startY = -60.89,startHeading=-90;
 
-    public boolean recevieinfo=false,colorRed=true,configured=false,update=true;
+    public boolean recevieinfo=false,colorRed=true,configured=false,update=true,manual=false;
 
    // public  Pose startPose = poseFactory.of(startX,startY,-90);
    public  Pose startPose ;
-    // Path methods
-//    private Path startToScore() {
-//        return line(startPose, scorePose).constant(startPose);
-//    }
 
 
 
@@ -326,7 +322,7 @@ public class AutoMeet2 extends OpMode {
 
                 if(colorRed)follower.follow(pathstartShootLred());
            //     else follower.follow(firstShootblue1());
-                intakeBack.setPower(0.7);
+                intakeBack.setPower(0.6);
                 pathState = 1;
                 break;
 
@@ -344,14 +340,12 @@ public class AutoMeet2 extends OpMode {
 
                 break;
             case 3:
-                if(rbga.timer(1500)) {
+                if(rbga.timer(1000)) {
                   //  flyWheel.setPower(0);
                     intakeFront.setPower(0);
                     intakeBack.setPower(0);
                     Blocker.setPosition(rbga.blockClose);
                     if(colorRed)   follower.follow(pathshootLflowerLred());
-
-                   // update=false;
                     pathState=7;
 
                 }

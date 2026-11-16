@@ -25,35 +25,29 @@ public class base  {// to save common data and function.
     InterpLUT Hoodlut = new InterpLUT();
     double dist = 0;
     public final double flyp = 0.012, flyi=0, flyd = 0, flyv = 0.00036, flys = 0.04;
-    public final double hoodCollapse = 0.38, hoodExtend = 0.28, hoodShoot = 0.35;
+
 
     public final double flipperExtend = 0.07, flipperCollapse = 0.45;
 
-//    public final double flipperExtend = 0.08, flipperCollapse = 0.5;
-
-
-
- //  public final double blockClose = 0.48, blockOpen = 0.22;
-
    public final double blockClose = 0.5, blockOpen = 0.22;
 
-    public boolean shooting = false, canShoot = false;
+
     public static final double  startX1 = -16.01 , startY1=-62.3,starH1=-90;// = -55.49;
-//    public final double  startXred1=startX1, startYred1=startY1,startHeadingred1=-90;
-//    public final double startXblue1=-startX1,startYbue1=-startY1 ,startHeadingblue1=90;
+
 
      public final PoseFactory p = PoseFactory.degrees();
-    public double targetX = -12.3, targetY = -15;//-70.6+55
+     //12.7,12.1  ,     19.3
+    public double targetX = -12.7, targetY = -16;//-70.6+55
     public double targetXredl = targetX, targetYredl = targetY;
     public double targetXredh = targetX, targetYredh = -targetY;
     public double targetXbluel = -targetX, targetYbluel = targetY;
     public double targetXblueh = -targetX, targetYblueh = -targetY;
-    public double targetHeading = 0,currentHeading=0;
+  //  public double targetHeading = 0,currentHeading=0;
     public Pose startPosered1 = p.of(startX1,startY1,starH1);
     public Pose startPoseblue1 = p.of(-startX1,-startY1,-starH1);
 
 
-    public  Pose targetPose = p.of(targetX,targetY,-90);
+
     public  Pose targetPoseredl = p.of(targetXredl,targetYredl,180);
     public  Pose targetPoseredh = p.of(targetXredh,targetYredh,0);
     public  Pose targetPosebluel = p.of(targetXbluel,targetYbluel,180);
