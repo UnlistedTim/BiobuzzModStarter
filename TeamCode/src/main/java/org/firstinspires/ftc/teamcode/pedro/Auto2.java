@@ -24,7 +24,7 @@ public class Auto2 extends OpMode {
     private Follower follower;
     private final PoseFactory poseFactory = PoseFactory.degrees();
     private Pose pose,targetPose;
-    private double currentH,targetH,flyCurrentVel,dist = 35.36 ,targetflyvel;
+    private double targetH,flyCurrentVel,dist = 32 ,targetflyvel;//35.36
 
 
     private int pathState=0;
@@ -43,35 +43,52 @@ public class Auto2 extends OpMode {
 
 
     public base rbga=new base();
-    private final Pose parkRed1 = poseFactory.of(-50, 20, -90);
+    private final Pose parkred = poseFactory.of(-55, 25, 90);
     private final Pose parkPoseblue1 = poseFactory.of(53, -30, 90);
 
-    private final Pose shootRedL = poseFactory.of(-11.65, -55.6, -90);
+    private final Pose shootLred = poseFactory.of(-11.65, -55.6, -90);
+    private final Pose shootLtranred = poseFactory.of(-10, -35, -90);
     private final Pose shootBlueH = poseFactory.of(11.65, 55.6, 90);
-    private final Pose ctlshootRedH = poseFactory.of(-46, 46, 0);
 
-    private final Pose shootRedH = poseFactory.of(-11.65, 55.6, 90);
-    private final Pose shootBlueL = poseFactory.of(-11.65, 55.6, 90);
+    private final Pose shootHred = poseFactory.of(-22,52, 100);
+    private final Pose shootHtranred = poseFactory.of(-10, 30, -90);
+
+
     private final Pose parkPosectlred1 = poseFactory.of(-47, -47, -90);
     private final Pose parkPosectlblue1 = poseFactory.of(47, 47, 90);
-    private final Pose flowerRedL = poseFactory.of(-58, -23, -180);
-    private final Pose flowerRedH = poseFactory.of(-23, -58, 90);
-    private final Pose cornerRed= poseFactory.of(-57, -47, -90);
+    private final Pose flowerLred = poseFactory.of(-49, -23, 180);
+    private final Pose flowerLtranred = poseFactory.of(-40, 25, 90);
+    private final Pose flowerHred = poseFactory.of(-24, 59, 100);
+    private final Pose cornerred= poseFactory.of(-60, -53, -100);
+
 
 
 
 
     //  private double startX = -16.01 , startY = -60.89,startHeading=-90;
 
-    public boolean recevieinfo=false,colorRed=true,configured=false,update=true,manual=false;
+    public boolean recevieinfo=false,colorRed=true,configured=false,update=true;
 
    // public  Pose startPose = poseFactory.of(startX,startY,-90);
    public  Pose startPose ;
 
+    Path corrnershootLred= Paths.line(cornerred,shootLtranred).linear(cornerred,shootLtranred);
+    Path shootLshootHtransred= Paths.line(shootLtranred,shootHtranred).constant(Math.toRadians(-90));
+    Path shootHtransshootHred= Paths.line(shootHtranred,shootHred).linear(shootHtranred,shootHred);
 
+
+    Path flowerHflowerLtranred= Paths.line(flowerHred,flowerLtranred).linear(flowerHred,flowerLtranred);
+    Path flowerLtranflowerLred= Paths.line(flowerLtranred,flowerLred).linear(flowerLtranred,flowerLred);
+    Path flowerLflowerLtranred= Paths.line(flowerLred,flowerLtranred).linear(flowerLred,flowerLtranred);
+    Path flowerLtranshootHred= Paths.line(flowerLtranred,shootHred).linear(flowerLtranred,shootHred);
+
+
+    Path shootHflowerLtranred= Paths.line(shootHred,flowerLtranred).linear(shootHred,flowerLtranred);
+
+    Path flowerLtranparkred= Paths.line(flowerLtranred,parkred).constant(Math.toRadians(90));
 
     private Path parkred1(){
-        return Paths.curve(shootRedL, parkPosectlred1,parkRed1).constant(Math.toRadians(-90));
+        return Paths.curve(shootLred, parkPosectlred1,parkred).constant(Math.toRadians(-90));
        // return line()
     }
     private Path parkblue1(){
@@ -79,8 +96,8 @@ public class Auto2 extends OpMode {
         // return line()
     }
 
-    private Path pathstartShootLred(){
-        return Paths.line(startPose, shootRedL).constant(Math.toRadians(-90));
+    private Path pathstartshootLred(){
+        return Paths.line(startPose, shootLred).constant(Math.toRadians(-90));
         // return line()
     }
     private Path pathstarshootHblue(){
@@ -89,48 +106,59 @@ public class Auto2 extends OpMode {
     }
     private Path
     pathshootLflowerLred(){
-        return Paths.line(shootRedL, flowerRedL).linear(shootRedL,flowerRedL);
-        // return line()
-    }
-    private Path pathflowerLshootHred(){
-        return Paths.curve(flowerRedL, ctlshootRedH,shootRedH).linear(flowerRedL,shootRedH);
-        // return line()
-    }
-    private Path pathshootHflowerHred(){
-        return Paths.line(shootRedH, flowerRedH).constant(Math.toRadians(90));
-        // return line()
-    }
-    private Path pathflowerHshootHred(){
-        return Paths.line(flowerRedH,shootRedH).constant(Math.toRadians(90));
+        return Paths.line(shootLred, flowerLred).linear(shootLred,flowerLred);
         // return line()
     }
 
-    private Path pathshootHcornerred(){
-        return Paths.curve(shootRedH, ctlshootRedH,cornerRed).linear(shootRedH,cornerRed);
+
+    private Path pathshootHflowerHred(){
+        return Paths.line(shootHred, flowerHred).constant(Math.toRadians(90));
         // return line()
     }
-    private Path pathcornershootHred(){
-        return Paths.curve(cornerRed, ctlshootRedH,shootRedH).linear(cornerRed,ctlshootRedH);
+
+
+
+    private Path  pathshootLcornerred(){
+        return Paths.line(shootLred,cornerred).linear(shootLred,cornerred);
         // return line()
+    }
+
+
+//    private Path pathcornershootHred(){
+//        return Paths.line(angelcornerRed,shootRedH).linear(angelcornerRed,shootRedH);
+//        // return line()
+//    }
+
+//    private Path pathshootHparkred(){
+//        return Paths.line(shootHred,parkred).linear(shootHred,parkred);
+//        // return line()
+//    }
+
+    private Path pathcornershootHred(){
+
+        return Paths.path(corrnershootLred,shootLshootHtransred,shootHtransshootHred);
+    }
+
+    private Path pathflowerHflowerLred(){
+
+        return Paths.path(flowerHflowerLtranred,flowerLtranflowerLred);
+    }
+
+
+
+
+    private Path pathflowerLshootHred(){
+
+        return Paths.path(flowerLflowerLtranred,flowerLtranshootHred);
     }
 
     private Path pathshootHparkred(){
-        return Paths.line(shootRedH,parkRed1).constant(Math.toRadians(90));
-        // return line()
+
+        return Paths.path(shootHflowerLtranred,flowerLtranparkred);
     }
 
-//    private Path parkblue1(){
-//        return line(scorePose, parkPose).linear(scorePose, parkPose);
-//    }
 
 
-//    private Command autoRoutine() {
-//        return sequential(
-//                follow(follower, startToScore()),
-//                // Add mechanism commands here.
-//                follow(follower, parkred1())
-//        );
-//    }
 
     @Override
     public void init() {
@@ -277,7 +305,9 @@ public class Auto2 extends OpMode {
     boolean shoot(){
        if(Math.abs(flyCurrentVel - targetflyvel)<40) {
            Blocker.setPosition(rbga.blockOpen);
+
            return true;
+
        }
         return false;
     }
@@ -289,7 +319,7 @@ public class Auto2 extends OpMode {
         flyCurrentVel = flyWheel.getVelocity();
         double offset=0;
 
-        currentH=Math.toDegrees(pose.heading());
+       // currentH=Math.toDegrees(pose.heading());
         if(pose.y()>0) {
             if(colorRed) targetPose = rbga.targetPoseredh;
             else targetPose = rbga.targetPoseblueh;
@@ -320,73 +350,85 @@ public class Auto2 extends OpMode {
             case 0:
                 
 
-                if(colorRed)follower.follow(pathstartShootLred());
+                if(colorRed)follower.follow(pathstartshootLred());
            //     else follower.follow(firstShootblue1());
-                intakeBack.setPower(0.6);
+              //  intakeBack.setPower(0.6);
                 pathState = 1;
                 break;
 
             case 1:
-                if(!follower.isBusy()) pathState = 2;
+                if(!follower.isBusy()) {
+                    pathState = 2;
+                    intakeBack.setPower(0.8);
+                    intakeFront.setPower(0.9);
+                }
+
                 break;
 
 
             case 2:
 
                 if(shoot()) {
+
                     rbga.timer(0);
                     pathState=3;
                 }
 
                 break;
             case 3:
-                if(rbga.timer(1000)) {
+                if(rbga.timer(1500)) {
                   //  flyWheel.setPower(0);
-                    intakeFront.setPower(0);
+                   // intakeFront.setPower(0);
                     intakeBack.setPower(0);
                     Blocker.setPosition(rbga.blockClose);
-                    if(colorRed)   follower.follow(pathshootLflowerLred());
+                    if(colorRed)   follower.follow(pathshootLcornerred());
                     pathState=7;
+
+                    rbga.timer(0);
 
                 }
                 break;
+
 
 
             case 7:
+
+
                 if(!follower.isBusy()) {
-                  //  Blocker.setPosition(rbga.blockClose);
-                    Flipper.setPosition(rbga.flipperExtend);
-                    follower.manual(0.25,0,0);
+
+                    follower.manual(0.3,0,0);
                     rbga.timer(0);
                     intakeFront.setPower(0.9);
-                    intakeBack.setPower(0.7);
+                    intakeBack.setPower(0.8);
                     pathState=9;
 
                 }
+
                 break;
+
+
+//
 
             case 9:
-                if(rbga.timer(1000)) {
-                    follower.manual(0,0,0);
-                    pathState=15;
-                }
+                if(rbga.timer(1200)) {
 
-                break;
-            case 15:
-                if(rbga.timer(2000))
-                {if(colorRed)   follower.follow(pathflowerLshootHred());
+                    if(colorRed)  follower.follow(pathcornershootHred());
+                    dist=28;
+
                     intakeBack.setPower(0);
                     intakeFront.setPower(0);
-
-                pathState=17;
-                rbga.timer(0);
+                    pathState=15;
+                    Flipper.setPosition(rbga.flippermid);
+                   // rbga.timer(0);
                 }
+
                 break;
 
-            case 17:
-                if(rbga.timer(400)) {
-                    Flipper.setPosition(rbga.flipperCollapse);
+            case 15:
+                if(follower.distanceToEndpoint()<80) {
+                    Flipper.setPosition(rbga.flipperExtend);
                     pathState=20;
+
                 }
 
                 break;
@@ -394,40 +436,41 @@ public class Auto2 extends OpMode {
             case 20:
                 if(!follower.isBusy()) {
                     pathState=25;
-                    intakeFront.setPower(0.9);
-                    intakeBack.setPower(0.7);
+
                 }
 
                 break;
 
             case 25:
-                if(shoot()) {pathState=30;rbga.timer(0);}
+                if(shoot()) {
+                    intakeFront.setPower(0.9);
+                    intakeBack.setPower(0.8);
+                    pathState = 30;
+                    rbga.timer(0);
+                }
+
                 break;
 
 
             case 30:
                 if(rbga.timer(1500)) {
-
-                    follower.follow(pathshootHflowerHred());
-                    Flipper.setPosition(rbga.flipperExtend);
                     Blocker.setPosition(rbga.blockClose);
+
+                    follower.manual(0.3,0,0);
+                    rbga.timer(0);
+                    dist=40;
+                    pathState=40;
+
                 }
 
                 break;
 
-            case 35:
-                if(!follower.isBusy()) {
-                    follower.manual(0.25,0,0);
 
-                    rbga.timer(0);
-
-                    pathState=40;
-                }
 
             case 40:
                 if(rbga.timer(1000)){
-
                     follower.manual(0,0,0);
+
                     pathState=45;
 
             }
@@ -435,84 +478,81 @@ public class Auto2 extends OpMode {
 
 
             case 45:
+                if(shoot()) {
+                    rbga.timer(0);
+
+                    pathState=50;
+                }
+                break;
+            case 50:
                 if(rbga.timer(2000)) {
 
-                    follower.follow(pathflowerHshootHred());
+                    Blocker.setPosition(rbga.blockClose);
                     intakeFront.setPower(0);
                     intakeBack.setPower(0);
-                    pathState=55;
+                    follower.follow( pathflowerHflowerLred());
+                    Flipper.setPosition(rbga.flippermid);
+                    dist=28;
+                    pathState=51;
 
                 }
                 break;
+            case 51:
+             if (follower.distanceToEndpoint()<40){
+                 Flipper.setPosition(rbga.flipperExtend);
 
+                 pathState=55;
+
+                }
+                break;
 
 
             case 55:
                 if(!follower.isBusy()) {
-                    pathState=60;
                     intakeFront.setPower(0.9);
-                    intakeBack.setPower(0.7);
-
-                }
-                break;
-            case 60:
-                if(shoot()) {
+                    intakeBack.setPower(0.8);
+                    follower.manual(0.3,0,0);
                     rbga.timer(0);
-                    pathState=65;}
-                break;
-            case 65:
-                if(rbga.timer(1500)) {
-
-                    Blocker.setPosition(rbga.blockClose);
-                    pathState=70;
+                    pathState=60;
                 }
                 break;
+
+            case 60:
+                if(rbga.timer(1000)) {
+
+                    follower.manual(0,0,0);
+                    pathState=65;
+                }
+                break;
+
+            case 65:
+                if(rbga.timer(2000)) {
+
+                    follower.follow(pathflowerLshootHred());
+                    Flipper.setPosition(rbga.flipperCollapse);
+                    intakeBack.setPower(0);
+                    intakeFront.setPower(0);
+                    pathState=70;
+
+                }
+                break;
+
+
             case 70:
-                follower.follow(pathshootHcornerred());
-                pathState=75;
+                if(!follower.isBusy()){
+
+                    pathState=75;
+                }
                 break;
             case 75:
-                if(!follower.isBusy()) {
-                    follower.manual(0.3,0,0);
+                if(shoot()) {
+                    intakeFront.setPower(0.9);
+                    intakeBack.setPower(0.8);
                     rbga.timer(0);
                     pathState=80;
                 }
                 break;
-
             case 80:
-                if(rbga.timer(1000)) {
-
-                    follower.manual(-0.15,0,0);
-                    pathState=85;
-                }
-                break;
-
-            case 85:
-                if(rbga.timer(2000)) {
-
-
-                    pathState=90;
-                }
-                break;
-
-            case 90:
-                follower.follow(pathcornershootHred());
-                pathState=95;
-                break;
-
-            case 95:
-                if(!follower.isBusy()){
-
-                    pathState=100;
-                }
-                break;
-            case 100:
-                if(shoot()) {
-                    rbga.timer(0);
-                    pathState=105;
-                }
-                break;
-            case 105:
                 if(rbga.timer(1500)) {
 
                     Blocker.setPosition(rbga.blockClose);
@@ -521,25 +561,28 @@ public class Auto2 extends OpMode {
                     intakeBack.setPower(0);
                     intakeFront.setPower(0);
                     follower.follow(pathshootHparkred());
-
-                    pathState=110;
-
+                    pathState=85;
 
                 }
                 break;
 
-            case 110:
+            case 85:
                 if(!follower.isBusy()){
 
-                    pathState=200;
+
+                    rbga.timer(0);
+                    follower.manual(0,0,0);
+                    pathState=100;
+
                 }
                 break;
 
+            case 100:
+                if(rbga.timer(500)) {
+                    autosave();
+                    pathState = 200;
+                }
             case 200:
-                sleep(500);
-                autosave();
-                pathState=210;
-            case 210:
                 break;
 
         }

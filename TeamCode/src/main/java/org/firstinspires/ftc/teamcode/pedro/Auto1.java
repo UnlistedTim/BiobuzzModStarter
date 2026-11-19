@@ -57,7 +57,7 @@ public class Auto1 extends OpMode {
     private final Pose parkPosectlblue1 = poseFactory.of(47, 47, 90);
   //  private double startX = -16.01 , startY = -60.89,startHeading=-90;
 
-    public boolean recevieinfo=false,colorRed=true,configured=false,update=true,manual=false;
+    public boolean recevieinfo=false,colorRed=true,configured=false,update=true;
 
    // public  Pose startPose = poseFactory.of(startX,startY,-90);
    public  Pose startPose ;
@@ -86,18 +86,6 @@ public class Auto1 extends OpMode {
         // return line()
     }
 
-//    private Path parkblue1(){
-//        return line(scorePose, parkPose).linear(scorePose, parkPose);
-//    }
-
-
-//    private Command autoRoutine() {
-//        return sequential(
-//                follow(follower, startToScore()),
-//                // Add mechanism commands here.
-//                follow(follower, parkred1())
-//        );
-//    }
 
     @Override
     public void init() {
@@ -226,8 +214,8 @@ public class Auto1 extends OpMode {
 
     @Override
     public void loop() {
-        if(!manual)follower.update();
-        else follower.localizer.update();
+     follower.update();
+
        if(update) statusup();
         Pathupdate1();
 
@@ -346,11 +334,11 @@ public class Auto1 extends OpMode {
                 break;
             case 7:
                 if(!follower.isBusy()) {
-                    pathState = 100;
+
                     follower.manual(0,0,0);
-                    manual=true;
                     rbga.timer(0);
 
+                    pathState = 100;
                 }
 
                 break;

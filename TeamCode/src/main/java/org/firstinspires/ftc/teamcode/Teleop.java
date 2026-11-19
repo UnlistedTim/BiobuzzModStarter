@@ -62,7 +62,7 @@ public class Teleop extends LinearOpMode  {
 
 
 
-    public final double hoodCollapse = 0.38, hoodExtend = 0.28, hoodShoot = 0.35;
+    public final double  hoodShoot = 0.35;
 
 
 
@@ -216,7 +216,7 @@ public class Teleop extends LinearOpMode  {
                 case IDLE:
 
                     flyWheel.setPower(0.4);
-                    intakeFront.setPower(0.7);
+                    intakeFront.setPower(0.9);
                     intakeBack.setPower(0.7);
 //                    leftRoller.setPower(0.9);
 //                    rightRoller.setPower(0.9);

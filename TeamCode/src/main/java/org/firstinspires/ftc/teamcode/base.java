@@ -27,7 +27,7 @@ public class base  {// to save common data and function.
     public final double flyp = 0.012, flyi=0, flyd = 0, flyv = 0.00036, flys = 0.04;
 
 
-    public final double flipperExtend = 0.07, flipperCollapse = 0.45;
+    public final double flipperExtend = 0.07, flipperCollapse = 0.45,flippermid=0.2;
 
    public final double blockClose = 0.5, blockOpen = 0.22;
 
