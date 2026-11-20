@@ -46,11 +46,11 @@ public class Auto2 extends OpMode {
     private final Pose parkred = poseFactory.of(-55, 25, 90);
     private final Pose shootLred = poseFactory.of(-11.65, -55.6, -90);
     private final Pose shootLtranred = poseFactory.of(-10, -35, -90);
-    private final Pose shootHred = poseFactory.of(-22,52, 104);
+    private final Pose shootHred = poseFactory.of(-22,52, 100);
     private final Pose shootHtranred = poseFactory.of(-10, 30, -90);
     private final Pose flowerLred = poseFactory.of(-51, -23, 180);
     private final Pose flowerLtranred = poseFactory.of(-40, 25, 90);
-    private final Pose flowerHred = poseFactory.of(-24, 59, 104);
+    private final Pose flowerHred = poseFactory.of(-24, 59, 100);
     private final Pose cornerred= poseFactory.of(-60, -55, -100);
 
 
@@ -419,7 +419,7 @@ public class Auto2 extends OpMode {
                     else
                         follower.follow(pathcornershootLblue());
 
-                    dist = 39;
+                    dist = 31.78;
 
                     intakeBack.setPower(0);
                     intakeFront.setPower(0);
@@ -461,7 +461,7 @@ public class Auto2 extends OpMode {
 
                     follower.manual(0.3,0,0);
                     rbga.timer(0);
-                    dist = 45;
+                    dist = 39;
                     pathState = 40;
                 }
                 break;
@@ -496,7 +496,7 @@ public class Auto2 extends OpMode {
                         follower.follow(pathflowerLflowerHblue());
 
                     Flipper.setPosition(rbga.flippermid);
-                    dist = 39;
+                    dist = 31.78;
                     pathState = 51;
                 }
                 break;
