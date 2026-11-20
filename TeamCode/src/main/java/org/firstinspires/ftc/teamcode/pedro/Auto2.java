@@ -352,7 +352,7 @@ public class Auto2 extends OpMode {
     void Pathupdate1() {
 
 
-        if(autotime.seconds()>89&!complete) pathState=90;
+        if(autotime.seconds()>89&&!complete) pathState=90;
 
         switch (pathState) {
 
