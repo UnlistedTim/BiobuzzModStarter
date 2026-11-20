@@ -2,6 +2,43 @@ package org.firstinspires.ftc.teamcode;
 
 import android.annotation.SuppressLint;
 
+// dist, speed, hood
+
+// 22.047, 1050, 0.31
+
+//25.76, 1060, 0.31
+
+//34.95 , 1090, 0.33
+
+//39.76, 1090, 0.335
+
+// 49, 1120, 0.34
+
+//57.4, 1130,  0.35
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//
+
 //distance, speed, hood
 
 //20.79, 1090, 0.315
@@ -89,6 +126,9 @@ import java.util.List;
 
 public class ModStarterDebug extends LinearOpMode  {
 
+    public base rbg ;
+
+
     Pose pose;
 
 
@@ -128,11 +168,11 @@ public class ModStarterDebug extends LinearOpMode  {
 
     private final PoseFactory p = PoseFactory.degrees();
 
-    public static double targetX = -12.3, targetY = -15;
+    public static double targetX = -12.7, targetY = -16;
 
-    private Pose startPose = p.of(startX,startY,-90);
+    private Pose startPose = p.of(-16.01,-62.3,-90);
 
-    private Pose targetPose = p.of(targetX,targetY,-90);
+    private Pose targetPose = p.of(-12.7,-16,-90);
 
     public double targetHeading = 0;
 
@@ -177,6 +217,8 @@ public class ModStarterDebug extends LinearOpMode  {
     @Override
 
     public void runOpMode() {
+
+//        rbg= new base();
 
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
         initalize();

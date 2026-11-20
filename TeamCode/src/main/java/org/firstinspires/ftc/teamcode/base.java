@@ -95,7 +95,8 @@ public class base  {// to save common data and function.
         double turnPower=0;
         double error=theading-cheading ;
 
-        if (Math.abs(error)< 2)return turnPower;
+
+        if (Math.abs(error)< 1)return turnPower;
         if (Math.abs(error) > 180) error =-Math.signum(error) *Math.abs(360-Math.abs(error));// change rotation direction
 
         turnPower= drivePID.calculate(error);
@@ -158,19 +159,23 @@ public class base  {// to save common data and function.
    public void LUT_init(){
 
 
-//        Flylut.add(0 , 1000); Hoodlut.add(0 , 0.3);
-//        Flylut.add(20.79 , 1090); Hoodlut.add(20.79 , 0.315);
-//        Flylut.add(38.23 , 1120); Hoodlut.add(38.23 , 0.335);
-//        Flylut.add(45.26,1130); Hoodlut.add(45.26,0.345);
-//        Flylut.add(56.61,1180); Hoodlut.add(56.61,0.35);
-//        Flylut.add(200,1250); Hoodlut.add(200,0.37);
+
+
+//       Flylut.add(0 , 900); Hoodlut.add(0 , 0.31);
+//       Flylut.add(27.22 , 1070); Hoodlut.add(27.22 , 0.32);
+//       Flylut.add(43.955 , 1120); Hoodlut.add(43.955 , 0.338);
+//       Flylut.add(59.22,1190); Hoodlut.add(59.22,0.345);
+//       Flylut.add(78.38,1280); Hoodlut.add(78.38,0.38);
+//       Flylut.add(200,1400); Hoodlut.add(200,0.39);
 
        Flylut.add(0 , 900); Hoodlut.add(0 , 0.31);
-       Flylut.add(27.22 , 1070); Hoodlut.add(27.22 , 0.32);
-       Flylut.add(43.955 , 1120); Hoodlut.add(43.955 , 0.338);
-       Flylut.add(59.22,1190); Hoodlut.add(59.22,0.345);
-       Flylut.add(78.38,1280); Hoodlut.add(78.38,0.38);
-       Flylut.add(200,1400); Hoodlut.add(200,0.39);
+       Flylut.add(22.047 , 1050); Hoodlut.add(22.047 , 0.31);
+       Flylut.add(25.76 , 1060); Hoodlut.add(25.76 , 0.31);
+       Flylut.add(34.95,1090); Hoodlut.add(34.95,0.33);
+       Flylut.add(39.76,1090); Hoodlut.add(39.76,0.335);
+       Flylut.add(49,1120); Hoodlut.add(49,0.34);
+       Flylut.add(57.4,1130); Hoodlut.add(57.4,0.35);
+       Flylut.add(200,1400); Hoodlut.add(200,0.38);
 
         Flylut.createLUT();
         Hoodlut.createLUT();
