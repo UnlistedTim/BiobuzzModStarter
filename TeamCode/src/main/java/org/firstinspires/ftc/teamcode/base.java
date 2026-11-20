@@ -96,9 +96,9 @@ public class base  {// to save common data and function.
         double error=theading-cheading ;
 
 
-        if (Math.abs(error)< 1)return turnPower;
-        if (Math.abs(error) > 180) error =-Math.signum(error) *Math.abs(360-Math.abs(error));// change rotation direction
 
+        if (Math.abs(error) > 180) error =-Math.signum(error) *Math.abs(360-Math.abs(error));// change rotation direction
+        if (Math.abs(error)< 1)return turnPower;
         turnPower= drivePID.calculate(error);
 
         turnPower+= Math.signum(turnPower) * driveKs;

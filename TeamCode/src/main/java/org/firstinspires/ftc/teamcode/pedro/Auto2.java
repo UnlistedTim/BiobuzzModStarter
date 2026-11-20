@@ -9,7 +9,7 @@ import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -24,7 +24,7 @@ public class Auto2 extends OpMode {
     private Follower follower;
     private final PoseFactory poseFactory = PoseFactory.degrees();
     private Pose pose,targetPose;
-    private double targetH,flyCurrentVel,dist = 32 ,targetflyvel;//35.36
+    private double targetH,flyCurrentVel,dist = 34.21 ,targetflyvel;//35.36
 
 
     private int pathState=0;
@@ -44,23 +44,25 @@ public class Auto2 extends OpMode {
 
     public base rbga=new base();
     private final Pose parkred = poseFactory.of(-55, 25, 90);
-    private final Pose parkPoseblue1 = poseFactory.of(53, -30, 90);
-
     private final Pose shootLred = poseFactory.of(-11.65, -55.6, -90);
     private final Pose shootLtranred = poseFactory.of(-10, -35, -90);
-    private final Pose shootBlueH = poseFactory.of(11.65, 55.6, 90);
-
-    private final Pose shootHred = poseFactory.of(-22,52, 100);
+    private final Pose shootHred = poseFactory.of(-22,52, 104);
     private final Pose shootHtranred = poseFactory.of(-10, 30, -90);
-
-
-    private final Pose parkPosectlred1 = poseFactory.of(-47, -47, -90);
-    private final Pose parkPosectlblue1 = poseFactory.of(47, 47, 90);
-    private final Pose flowerLred = poseFactory.of(-49, -23, 180);
+    private final Pose flowerLred = poseFactory.of(-51, -23, 180);
     private final Pose flowerLtranred = poseFactory.of(-40, 25, 90);
-    private final Pose flowerHred = poseFactory.of(-24, 59, 100);
-    private final Pose cornerred= poseFactory.of(-60, -53, -100);
+    private final Pose flowerHred = poseFactory.of(-24, 59, 104);
+    private final Pose cornerred= poseFactory.of(-60, -55, -100);
 
+
+    private final Pose parkblue = poseFactory.of(55, -25, -90);
+    private final Pose shootHblue = poseFactory.of(11.65, 55.6, 90);
+    private final Pose shootHtranblue = poseFactory.of(10, 35, 90);
+    private final Pose shootLblue = poseFactory.of(22, -52, -76);
+    private final Pose shootLtranblue = poseFactory.of(10, -30, 90);
+    private final Pose flowerHblue = poseFactory.of(51, 23, 0);
+    private final Pose flowerHtranblue = poseFactory.of(40, -25, -90);
+    private final Pose flowerLblue = poseFactory.of(24, -59, -76);
+    private final Pose cornerblue = poseFactory.of(60, 55, 80);
 
 
 
@@ -87,52 +89,16 @@ public class Auto2 extends OpMode {
 
     Path flowerLtranparkred= Paths.line(flowerLtranred,parkred).constant(Math.toRadians(90));
 
-    private Path parkred1(){
-        return Paths.curve(shootLred, parkPosectlred1,parkred).constant(Math.toRadians(-90));
-       // return line()
-    }
-    private Path parkblue1(){
-        return Paths.curve(shootBlueH, parkPosectlblue1,parkPoseblue1).constant(Math.toRadians(90));
-        // return line()
-    }
 
     private Path pathstartshootLred(){
         return Paths.line(startPose, shootLred).constant(Math.toRadians(-90));
-        // return line()
-    }
-    private Path pathstarshootHblue(){
-        return Paths.line(startPose, shootBlueH).constant(Math.toRadians(90));
-        // return line()
-    }
-    private Path
-    pathshootLflowerLred(){
-        return Paths.line(shootLred, flowerLred).linear(shootLred,flowerLred);
-        // return line()
-    }
 
-
-    private Path pathshootHflowerHred(){
-        return Paths.line(shootHred, flowerHred).constant(Math.toRadians(90));
-        // return line()
     }
-
-
 
     private Path  pathshootLcornerred(){
         return Paths.line(shootLred,cornerred).linear(shootLred,cornerred);
         // return line()
     }
-
-
-//    private Path pathcornershootHred(){
-//        return Paths.line(angelcornerRed,shootRedH).linear(angelcornerRed,shootRedH);
-//        // return line()
-//    }
-
-//    private Path pathshootHparkred(){
-//        return Paths.line(shootHred,parkred).linear(shootHred,parkred);
-//        // return line()
-//    }
 
     private Path pathcornershootHred(){
 
@@ -156,8 +122,48 @@ public class Auto2 extends OpMode {
 
         return Paths.path(shootHflowerLtranred,flowerLtranparkred);
     }
+//blue
+    Path corrnershootHblue = Paths.line(cornerblue, shootHtranblue).linear(cornerblue, shootHtranblue);
+    Path shootHshootLtransblue = Paths.line(shootHtranblue, shootLtranblue).constant(Math.toRadians(90));
+    Path shootLtransshootLblue = Paths.line(shootLtranblue, shootLblue).linear(shootLtranblue, shootLblue);
 
 
+    Path flowerLflowerHtranblue = Paths.line(flowerLblue, flowerHtranblue).linear(flowerLblue, flowerHtranblue);
+    Path flowerHtranflowerHblue = Paths.line(flowerHtranblue, flowerHblue).linear(flowerHtranblue, flowerHblue);
+    Path flowerHflowerHtranblue = Paths.line(flowerHblue, flowerHtranblue).linear(flowerHblue, flowerHtranblue);
+    Path flowerHtranshootLblue = Paths.line(flowerHtranblue, shootLblue).linear(flowerHtranblue, shootLblue);
+
+
+    Path shootLflowerHtranblue = Paths.line(shootLblue, flowerHtranblue).linear(shootLblue, flowerHtranblue);
+
+
+    Path flowerHtranparkblue = Paths.line(flowerHtranblue, parkblue).constant(Math.toRadians(-90));
+
+
+    private Path pathstartshootHblue() {
+        return Paths.line(startPose, shootHblue).constant(Math.toRadians(90));
+    }
+
+    private Path pathshootHcornerblue() {
+        return Paths.line(shootHblue, cornerblue).linear(shootHblue, cornerblue);
+        // return line()
+    }
+
+    private Path pathcornershootLblue() {
+        return Paths.path(corrnershootHblue, shootHshootLtransblue, shootLtransshootLblue);
+    }
+
+    private Path pathflowerLflowerHblue() {
+        return Paths.path(flowerLflowerHtranblue, flowerHtranflowerHblue);
+    }
+
+    private Path pathflowerHshootLblue() {
+        return Paths.path(flowerHflowerHtranblue, flowerHtranshootLblue);
+    }
+
+    private Path pathshootLparkblue() {
+        return Paths.path(shootLflowerHtranblue, flowerHtranparkblue);
+    }
 
 
     @Override
@@ -329,8 +335,8 @@ public class Auto2 extends OpMode {
             if(colorRed) targetPose = rbga.targetPoseredl;
             else targetPose = rbga.targetPosebluel;
         }
-        if (dist == 0) dist = pose.distance(targetPose);
-
+//     //   if (dist == 0) dist = pose.distance(targetPose);
+//        dist = pose.distance(targetPose)-5.4;
 
         targetflyvel=rbga.flySpeed(dist);
         targetH = Math.toDegrees(Math.atan2(pose.y()-targetPose.y() , pose.x()-targetPose.x() ));
@@ -348,11 +354,12 @@ public class Auto2 extends OpMode {
         switch (pathState) {
 
             case 0:
-                
 
-                if(colorRed)follower.follow(pathstartshootLred());
-           //     else follower.follow(firstShootblue1());
-              //  intakeBack.setPower(0.6);
+                if(colorRed)
+                    follower.follow(pathstartshootLred());
+                else
+                    follower.follow(pathstartshootHblue());
+
                 pathState = 1;
                 break;
 
@@ -362,48 +369,43 @@ public class Auto2 extends OpMode {
                     intakeBack.setPower(0.8);
                     intakeFront.setPower(0.9);
                 }
-
                 break;
 
 
             case 2:
-
                 if(shoot()) {
-
                     rbga.timer(0);
-                    pathState=3;
+                    pathState = 3;
                 }
-
                 break;
+
+
             case 3:
                 if(rbga.timer(1500)) {
-                  //  flyWheel.setPower(0);
-                   // intakeFront.setPower(0);
+                    // flyWheel.setPower(0);
+                    // intakeFront.setPower(0);
                     intakeBack.setPower(0);
                     Blocker.setPosition(rbga.blockClose);
-                    if(colorRed)   follower.follow(pathshootLcornerred());
-                    pathState=7;
 
+                    if(colorRed)
+                        follower.follow(pathshootLcornerred());
+                    else
+                        follower.follow(pathshootHcornerblue());
+
+                    pathState = 7;
                     rbga.timer(0);
-
                 }
                 break;
-
 
 
             case 7:
-
-
                 if(!follower.isBusy()) {
-
                     follower.manual(0.3,0,0);
                     rbga.timer(0);
                     intakeFront.setPower(0.9);
                     intakeBack.setPower(0.8);
-                    pathState=9;
-
+                    pathState = 9;
                 }
-
                 break;
 
 
@@ -412,34 +414,36 @@ public class Auto2 extends OpMode {
             case 9:
                 if(rbga.timer(1200)) {
 
-                    if(colorRed)  follower.follow(pathcornershootHred());
-                    dist=28;
+                    if(colorRed)
+                        follower.follow(pathcornershootHred());
+                    else
+                        follower.follow(pathcornershootLblue());
+
+                    dist = 34.21;
 
                     intakeBack.setPower(0);
                     intakeFront.setPower(0);
-                    pathState=15;
+                    pathState = 15;
                     Flipper.setPosition(rbga.flippermid);
-                   // rbga.timer(0);
+                    // rbga.timer(0);
                 }
-
                 break;
+
 
             case 15:
-                if(follower.distanceToEndpoint()<80) {
+                if(follower.distanceToEndpoint() < 80) {
                     Flipper.setPosition(rbga.flipperExtend);
-                    pathState=20;
-
+                    pathState = 20;
                 }
-
                 break;
+
 
             case 20:
                 if(!follower.isBusy()) {
-                    pathState=25;
-
+                    pathState = 25;
                 }
-
                 break;
+
 
             case 25:
                 if(shoot()) {
@@ -448,7 +452,6 @@ public class Auto2 extends OpMode {
                     pathState = 30;
                     rbga.timer(0);
                 }
-
                 break;
 
 
@@ -458,51 +461,51 @@ public class Auto2 extends OpMode {
 
                     follower.manual(0.3,0,0);
                     rbga.timer(0);
-                    dist=40;
-                    pathState=40;
-
+                    dist = 39;
+                    pathState = 40;
                 }
-
                 break;
 
 
-
             case 40:
-                if(rbga.timer(1000)){
+                if(rbga.timer(1000)) {
                     follower.manual(0,0,0);
-
-                    pathState=45;
-
-            }
+                    pathState = 45;
+                }
                 break;
 
 
             case 45:
                 if(shoot()) {
                     rbga.timer(0);
-
-                    pathState=50;
+                    pathState = 50;
                 }
                 break;
+
+
             case 50:
                 if(rbga.timer(2000)) {
 
                     Blocker.setPosition(rbga.blockClose);
                     intakeFront.setPower(0);
                     intakeBack.setPower(0);
-                    follower.follow( pathflowerHflowerLred());
-                    Flipper.setPosition(rbga.flippermid);
-                    dist=28;
-                    pathState=51;
 
+                    if(colorRed)
+                        follower.follow(pathflowerHflowerLred());
+                    else
+                        follower.follow(pathflowerLflowerHblue());
+
+                    Flipper.setPosition(rbga.flippermid);
+                    dist = 28;
+                    pathState = 51;
                 }
                 break;
+
+
             case 51:
-             if (follower.distanceToEndpoint()<40){
-                 Flipper.setPosition(rbga.flipperExtend);
-
-                 pathState=55;
-
+                if(follower.distanceToEndpoint() < 40) {
+                    Flipper.setPosition(rbga.flipperExtend);
+                    pathState = 55;
                 }
                 break;
 
@@ -513,75 +516,93 @@ public class Auto2 extends OpMode {
                     intakeBack.setPower(0.8);
                     follower.manual(0.3,0,0);
                     rbga.timer(0);
-                    pathState=60;
+                    pathState = 60;
                 }
                 break;
+
 
             case 60:
                 if(rbga.timer(1000)) {
-
                     follower.manual(0,0,0);
-                    pathState=65;
+                    pathState = 65;
                 }
                 break;
+
 
             case 65:
                 if(rbga.timer(2000)) {
 
-                    follower.follow(pathflowerLshootHred());
+                    if(colorRed)
+                        follower.follow(pathflowerLshootHred());
+                    else
+                        follower.follow(pathflowerHshootLblue());
+
+                    pathState = 67;
+                }
+                break;
+
+            case 67:
+                if(rbga.timer(2400)) {
+
                     Flipper.setPosition(rbga.flipperCollapse);
                     intakeBack.setPower(0);
                     intakeFront.setPower(0);
-                    pathState=70;
-
+                    pathState = 70;
                 }
-                break;
-
 
             case 70:
-                if(!follower.isBusy()){
-
-                    pathState=75;
+                if(!follower.isBusy()) {
+                    pathState = 75;
                 }
                 break;
+
+
             case 75:
                 if(shoot()) {
                     intakeFront.setPower(0.9);
                     intakeBack.setPower(0.8);
                     rbga.timer(0);
-                    pathState=80;
+                    pathState = 80;
                 }
                 break;
+
+
             case 80:
                 if(rbga.timer(1500)) {
 
                     Blocker.setPosition(rbga.blockClose);
-                    update=false;
+                    update = false;
                     flyWheel.setPower(0);
                     intakeBack.setPower(0);
                     intakeFront.setPower(0);
-                    follower.follow(pathshootHparkred());
-                    pathState=85;
 
+                    if(colorRed)
+                        follower.follow(pathshootHparkred());
+                    else
+                        follower.follow(pathshootLparkblue());
+
+                    pathState = 85;
                 }
                 break;
+
 
             case 85:
-                if(!follower.isBusy()){
-
-
+                if(!follower.isBusy()) {
                     rbga.timer(0);
                     follower.manual(0,0,0);
-                    pathState=100;
-
+                    pathState = 100;
                 }
                 break;
+
 
             case 100:
                 if(rbga.timer(500)) {
                     autosave();
                     pathState = 200;
                 }
+                break;
+
+
             case 200:
                 break;
 

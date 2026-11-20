@@ -353,7 +353,7 @@ public class Teleop extends LinearOpMode  {
             else targetPose = rbg.targetPosebluel;
         }
         targetHeading = Math.toDegrees(Math.atan2( pose.y()-targetPose.y() , pose.x()-targetPose.x()));
-         if(targetHeading<0) targetHeading=targetHeading+360;
+       //  if(targetHeading<0) targetHeading=targetHeading+360;
         dist = pose.distance(targetPose)-5.4;
         Hood.setPosition(rbg.flyHood(dist));
         targetFlyVel = rbg.flySpeed(dist);
@@ -446,7 +446,7 @@ public class Teleop extends LinearOpMode  {
         leftBack.setPower(turnp);
         rightFront.setPower(-turnp);
         rightBack.setPower(-turnp);
-        return turnp==0;
+        return turnp==0;//if turnp==0,true;
     }
 
 
