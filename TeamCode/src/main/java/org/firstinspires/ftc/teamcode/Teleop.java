@@ -178,7 +178,7 @@ public class Teleop extends LinearOpMode  {
         telemetry.update();
         if (recevieinfo) {
             startPose= rbg.startpos(colorRed);
-            colorFactor = -1 + 2 * Boolean.compare(colorRed, false);
+
             recevieinfo=false;
         }
 
@@ -545,6 +545,7 @@ public class Teleop extends LinearOpMode  {
 
     public void afterstart() {
 
+        colorFactor = -1 + 2 * Boolean.compare(colorRed, false);
         pose = follower.pose();
         runtime.reset();
         Blocker.setPosition(rbg.blockClose);
@@ -715,6 +716,8 @@ public class Teleop extends LinearOpMode  {
     }
 
     public void mecanumRobotDrive(double y, double x, double rx){
+
+        telemetry.addData("Color factor", colorFactor);
 
         y*= colorFactor;
         x*=colorFactor;

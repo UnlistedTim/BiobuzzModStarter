@@ -44,7 +44,7 @@ public class Auto2 extends OpMode {
 
     public base rbga=new base();
     private final Pose parkred = poseFactory.of(-55, 25, 90);
-    private final Pose shootLred = poseFactory.of(-11.65, -55.6, -90);
+    private final Pose shootLred = poseFactory.of(-10, -55.6, -90);
     private final Pose shootLtranred = poseFactory.of(-10, -35, -90);
     private final Pose shootHred = poseFactory.of(-22,52, 99);
     private final Pose shootHtranred = poseFactory.of(-10, 30, -90);
@@ -55,7 +55,7 @@ public class Auto2 extends OpMode {
 
 
     private final Pose parkblue = poseFactory.of(55, -25, -90);
-    private final Pose shootHblue = poseFactory.of(11.65, 55.6, 90);
+    private final Pose shootHblue = poseFactory.of(10, 55.6, 90);
     private final Pose shootHtranblue = poseFactory.of(10, 35, 90);
     private final Pose shootLblue = poseFactory.of(22, -52, -81);
     private final Pose shootLtranblue = poseFactory.of(10, -30, 90);
