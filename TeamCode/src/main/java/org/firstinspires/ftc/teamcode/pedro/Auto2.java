@@ -46,22 +46,22 @@ public class Auto2 extends OpMode {
     private final Pose parkred = poseFactory.of(-55, 25, 90);
     private final Pose shootLred = poseFactory.of(-11.65, -55.6, -90);
     private final Pose shootLtranred = poseFactory.of(-10, -35, -90);
-    private final Pose shootHred = poseFactory.of(-22,52, 100);
+    private final Pose shootHred = poseFactory.of(-22,52, 99);
     private final Pose shootHtranred = poseFactory.of(-10, 30, -90);
     private final Pose flowerLred = poseFactory.of(-51, -23, 180);
     private final Pose flowerLtranred = poseFactory.of(-40, 25, 90);
-    private final Pose flowerHred = poseFactory.of(-24, 59, 100);
+    private final Pose flowerHred = poseFactory.of(-24, 59, 99);
     private final Pose cornerred= poseFactory.of(-60, -55, -100);
 
 
     private final Pose parkblue = poseFactory.of(55, -25, -90);
     private final Pose shootHblue = poseFactory.of(11.65, 55.6, 90);
     private final Pose shootHtranblue = poseFactory.of(10, 35, 90);
-    private final Pose shootLblue = poseFactory.of(22, -52, -80);
+    private final Pose shootLblue = poseFactory.of(22, -52, -81);
     private final Pose shootLtranblue = poseFactory.of(10, -30, 90);
     private final Pose flowerHblue = poseFactory.of(51, 23, 0);
     private final Pose flowerHtranblue = poseFactory.of(40, -25, -90);
-    private final Pose flowerLblue = poseFactory.of(24, -59, -80);
+    private final Pose flowerLblue = poseFactory.of(24, -59, -81);
     private final Pose cornerblue = poseFactory.of(60, 55, 80);
 
 
@@ -69,7 +69,7 @@ public class Auto2 extends OpMode {
 
     //  private double startX = -16.01 , startY = -60.89,startHeading=-90;
 
-    public boolean recevieinfo=false,colorRed=true,configured=false,update=true;
+    public boolean recevieinfo=false,colorRed=true,configured=false,update=true,complete=false;
 
    // public  Pose startPose = poseFactory.of(startX,startY,-90);
    public  Pose startPose ;
@@ -351,7 +351,12 @@ public class Auto2 extends OpMode {
 
     void Pathupdate1() {
 
+
+        if(autotime.seconds()>89&!complete) pathState=90;
+
         switch (pathState) {
+
+
 
             case 0:
 
@@ -591,13 +596,24 @@ public class Auto2 extends OpMode {
                     rbga.timer(0);
                     follower.manual(0,0,0);
                     pathState = 100;
+                    complete=true;
                 }
                 break;
 
+            case 90:
+                    rbga.timer(0);
+                    follower.manual(0,0,0);
+                    complete=true;
+                    flyWheel.setPower(0);
+                    intakeBack.setPower(0);
+                    intakeFront.setPower(0);
+                    pathState = 100;
 
+                break;
             case 100:
-                if(rbga.timer(500)) {
+                if(rbga.timer(700)) {
                     autosave();
+
                     pathState = 200;
                 }
                 break;
@@ -607,6 +623,7 @@ public class Auto2 extends OpMode {
                 break;
 
         }
+
     }
 
 
