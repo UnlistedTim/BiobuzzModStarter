@@ -57,11 +57,11 @@ public class Auto2 extends OpMode {
     private final Pose parkblue = poseFactory.of(55, -25, -90);
     private final Pose shootHblue = poseFactory.of(11.65, 55.6, 90);
     private final Pose shootHtranblue = poseFactory.of(10, 35, 90);
-    private final Pose shootLblue = poseFactory.of(22, -52, -76);
+    private final Pose shootLblue = poseFactory.of(22, -52, -80);
     private final Pose shootLtranblue = poseFactory.of(10, -30, 90);
     private final Pose flowerHblue = poseFactory.of(51, 23, 0);
     private final Pose flowerHtranblue = poseFactory.of(40, -25, -90);
-    private final Pose flowerLblue = poseFactory.of(24, -59, -76);
+    private final Pose flowerLblue = poseFactory.of(24, -59, -80);
     private final Pose cornerblue = poseFactory.of(60, 55, 80);
 
 
@@ -366,7 +366,7 @@ public class Auto2 extends OpMode {
             case 1:
                 if(!follower.isBusy()) {
                     pathState = 2;
-                    intakeBack.setPower(0.8);
+                    intakeBack.setPower(0.7);
                     intakeFront.setPower(0.9);
                 }
                 break;
@@ -403,7 +403,7 @@ public class Auto2 extends OpMode {
                     follower.manual(0.3,0,0);
                     rbga.timer(0);
                     intakeFront.setPower(0.9);
-                    intakeBack.setPower(0.8);
+                    intakeBack.setPower(0.7);
                     pathState = 9;
                 }
                 break;
@@ -419,7 +419,7 @@ public class Auto2 extends OpMode {
                     else
                         follower.follow(pathcornershootLblue());
 
-                    dist = 34.21;
+                    dist = 39;
 
                     intakeBack.setPower(0);
                     intakeFront.setPower(0);
@@ -448,7 +448,7 @@ public class Auto2 extends OpMode {
             case 25:
                 if(shoot()) {
                     intakeFront.setPower(0.9);
-                    intakeBack.setPower(0.8);
+                    intakeBack.setPower(0.7);
                     pathState = 30;
                     rbga.timer(0);
                 }
@@ -461,7 +461,7 @@ public class Auto2 extends OpMode {
 
                     follower.manual(0.3,0,0);
                     rbga.timer(0);
-                    dist = 39;
+                    dist = 45;
                     pathState = 40;
                 }
                 break;
@@ -496,7 +496,7 @@ public class Auto2 extends OpMode {
                         follower.follow(pathflowerLflowerHblue());
 
                     Flipper.setPosition(rbga.flippermid);
-                    dist = 28;
+                    dist = 39;
                     pathState = 51;
                 }
                 break;
@@ -513,7 +513,7 @@ public class Auto2 extends OpMode {
             case 55:
                 if(!follower.isBusy()) {
                     intakeFront.setPower(0.9);
-                    intakeBack.setPower(0.8);
+                    intakeBack.setPower(0.7);
                     follower.manual(0.3,0,0);
                     rbga.timer(0);
                     pathState = 60;
@@ -560,7 +560,7 @@ public class Auto2 extends OpMode {
             case 75:
                 if(shoot()) {
                     intakeFront.setPower(0.9);
-                    intakeBack.setPower(0.8);
+                    intakeBack.setPower(0.7);
                     rbga.timer(0);
                     pathState = 80;
                 }
