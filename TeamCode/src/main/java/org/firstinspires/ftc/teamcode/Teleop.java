@@ -441,7 +441,7 @@ public class Teleop extends LinearOpMode  {
         telemetry.addData("Angle error", targetHeading - currentHeading);
         telemetry.update();
 
-        double turnp=rbg.flooralign(currentHeading,targetHeading-2);//2 degree cal;
+        double turnp=rbg.flooralign(currentHeading,targetHeading-3);//3 degree cal;
         leftFront.setPower(turnp);
         leftBack.setPower(turnp);
         rightFront.setPower(-turnp);
