@@ -602,6 +602,8 @@ public class Teleop extends LinearOpMode  {
         intakeFront.setDirection(DcMotorSimple.Direction.FORWARD);
         intakeBack.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        Flipper.setDirection(Servo.Direction.REVERSE);
+
 
 
 

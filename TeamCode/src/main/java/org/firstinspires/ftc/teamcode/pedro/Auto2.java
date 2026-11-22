@@ -669,6 +669,8 @@ public class Auto2 extends OpMode {
             intakeFront.setDirection(DcMotorSimple.Direction.FORWARD);
             intakeBack.setDirection(DcMotorSimple.Direction.REVERSE);
 
+         Flipper.setDirection(Servo.Direction.REVERSE);
+
 //            leftRoller.setDirection(DcMotorSimple.Direction.REVERSE);
 //            rightRoller.setDirection(DcMotorSimple.Direction.FORWARD);
 

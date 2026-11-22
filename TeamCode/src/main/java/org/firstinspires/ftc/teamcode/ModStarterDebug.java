@@ -392,6 +392,8 @@ public class ModStarterDebug extends LinearOpMode  {
         intakeFront.setDirection(DcMotorSimple.Direction.FORWARD);
         intakeBack.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        Flipper.setDirection(Servo.Direction.REVERSE);
+
 
         Flywheel.setDirection(DcMotorSimple.Direction.FORWARD);
         Flywheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
