@@ -52,6 +52,7 @@ public class Teleop extends LinearOpMode  {
 
 
 
+
    // private VoltageSensor voltageSensor;
 
     public double colorFactor = 1;
@@ -182,11 +183,7 @@ public class Teleop extends LinearOpMode  {
             recevieinfo=false;
         }
 
-
-//        Pinpoint.setPosition(new Pose2D(DistanceUnit.INCH, startX, startY, AngleUnit.RADIANS, startHeading));
-//        pose = Pinpoint.getPosition();
         waitForStart();
-
         afterstart();
 
         for (LynxModule module : allHubs) {

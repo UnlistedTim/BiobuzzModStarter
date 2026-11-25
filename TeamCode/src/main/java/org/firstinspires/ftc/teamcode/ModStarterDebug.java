@@ -68,6 +68,8 @@ import com.pedropathing.math.Pose;
 import com.pedropathing.api.PoseFactory;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.math.Pose;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -135,10 +137,12 @@ public class ModStarterDebug extends LinearOpMode  {
     private DcMotorEx intakeBack,intakeFront, Flywheel,  leftFront, rightFront, leftBack, rightBack;
 
     private Servo Hood, Blocker, Flipper;
+    double Tx=0, Ty=0;
 
     double dist = 0;
 
-    private CRServo leftRoller, rightRoller;
+   // private CRServo leftRoller, rightRoller;
+   private Limelight3A Limelight;
 
     public static double flyp = 0.012, flyi=0, flyd = 0, flyv = 0.00036, flys = 0.04;
 
@@ -175,6 +179,7 @@ public class ModStarterDebug extends LinearOpMode  {
     private Pose targetPose = p.of(-12.7,-16,-90);
 
     public double targetHeading = 0;
+    LLResult result;
 
     public static double leftRollerPower = 0, rightRollerPower = 0;
 
@@ -228,6 +233,10 @@ public class ModStarterDebug extends LinearOpMode  {
 //        Pinpoint.setPosition(new Pose2D(DistanceUnit.INCH, startX, startY, AngleUnit.RADIANS, startHeading));
 //        pose = Pinpoint.getPosition();
         waitForStart();
+        Limelight.pipelineSwitch(1);
+        Limelight.start();
+
+
 
 //        afterstart();
 
@@ -272,8 +281,8 @@ public class ModStarterDebug extends LinearOpMode  {
 
             intakeBack.setPower(intakeBackPower);
 
-            leftRoller.setPower(leftRollerPower);
-            rightRoller.setPower(rightRollerPower);
+//            leftRoller.setPower(leftRollerPower);
+//            rightRoller.setPower(rightRollerPower);
 
 
 
@@ -295,6 +304,16 @@ public class ModStarterDebug extends LinearOpMode  {
 //                autoAlign();
 //            }
             drivePID.setPID(driveP,driveI,driveD);
+            result=Limelight.getLatestResult();
+            if(result.isValid())  {
+                Tx=result.getTx();
+                Ty=result.getTy();
+            }
+            else {
+                Tx=1000;
+                Ty=1000;
+            }
+
 
             double turn =  mecanumPID(Math.toDegrees(pose.heading()),targetHeadingPIDTest);
 
@@ -366,8 +385,8 @@ public class ModStarterDebug extends LinearOpMode  {
         Blocker = hardwareMap.get(Servo.class, "Blocker");
         Flipper = hardwareMap.get(Servo.class,"Flipper");
 
-        leftRoller = hardwareMap.get(CRServo.class, "leftRoller");
-        rightRoller = hardwareMap.get(CRServo.class,"rightRoller");
+//        leftRoller = hardwareMap.get(CRServo.class, "leftRoller");
+//        rightRoller = hardwareMap.get(CRServo.class,"rightRoller");
 
 //        Flywheel = hardwareMap.get(DcMotorEx.class, "Flywheel");
         intakeFront = hardwareMap.get(DcMotorEx.class,"intakeFront");
@@ -398,8 +417,8 @@ public class ModStarterDebug extends LinearOpMode  {
         Flywheel.setDirection(DcMotorSimple.Direction.FORWARD);
         Flywheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        leftRoller.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightRoller.setDirection(DcMotorSimple.Direction.FORWARD);
+//        leftRoller.setDirection(DcMotorSimple.Direction.REVERSE);
+//        rightRoller.setDirection(DcMotorSimple.Direction.FORWARD);
 
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -411,6 +430,7 @@ public class ModStarterDebug extends LinearOpMode  {
         rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        Limelight = hardwareMap.get(Limelight3A.class, "Limelight");
 
 
 
