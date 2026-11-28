@@ -24,7 +24,7 @@ public class Auto2 extends OpMode {
     private Follower follower;
     private final PoseFactory poseFactory = PoseFactory.degrees();
     private Pose pose,targetPose;
-    private double targetH,flyCurrentVel,dist = 34.21 ,targetflyvel,Ty=0;//35.36
+    private double targetH,flyCurrentVel,dist = 32 ,targetflyvel,Ty=0;//35.36
     private double intaketarvel = 1800, intakecurvel;
 
     private CRServo reverseRoller;
@@ -553,23 +553,15 @@ public class Auto2 extends OpMode {
                 break;
             case 12:
                 if(!DT||!limedetect(limeindex)||rbga.timer(1500)) {
-                    pathState=13;
                     if(colorRed) limeindex=2;else limeindex=4;
                     Limelight.pipelineSwitch(limeindex);
                     Limelight.start();
+                    if(colorRed) follower.follow(pathshootLshootHred());
+                    else follower.follow(pathshootHshootLblue());
+                    pathState=15;
                 }
                 break;
 
-
-
-
-            case 13:
-
-                if(colorRed) follower.follow(pathshootLshootHred());
-                else follower.follow(pathshootHshootLblue());
-
-
-                break;
 
 
             case 15:
