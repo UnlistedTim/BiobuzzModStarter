@@ -137,6 +137,8 @@ public class ModStarterDebug extends LinearOpMode  {
     private DcMotorEx intakeBack,intakeFront, Flywheel,  leftFront, rightFront, leftBack, rightBack;
 
     private Servo Hood, Blocker, Flipper;
+
+    private CRServo reverseRoller;
     double Tx=0, Ty=0;
 
     double dist = 0;
@@ -146,13 +148,19 @@ public class ModStarterDebug extends LinearOpMode  {
 
     public static double flyp = 0.012, flyi=0, flyd = 0, flyv = 0.00036, flys = 0.04;
 
+    public static double intakeP = 0.0006, intakeI= 0, intakeD = 0, intakeV = 0.00038, intakeS = 0.05;
+
     private VoltageSensor voltageSensor;
 
     public static double intakeFrontPower = 0, intakeBackPower = 0;
 
     public static int flyVel  = 0;
 
+    public static int intakeVel  = 0;
+
     public double flyCurrentVel = 0;
+
+    public double intakeCurrentVel = 0;
 
 
     public static double hoodPos = 0.38; // 0.28 90 degree up, 0.39 fully in
@@ -160,6 +168,10 @@ public class ModStarterDebug extends LinearOpMode  {
     public static double blockerPos = 0.27; //0.27 up 0.63 collapse
 
     public static double flipperPos = 0.45; //0.75 up // 0.4 or 0.35 down
+
+    public static double reverseRollerPower = 0.0;
+
+
 
     public Follower follower;
 
@@ -269,17 +281,24 @@ public class ModStarterDebug extends LinearOpMode  {
             flyCurrentVel = Flywheel.getVelocity();
             Flywheel.setPower(flyPIDF(flyCurrentVel, flyVel));
 
+            intakeCurrentVel = intakeBack.getVelocity();
+            intakeBack.setPower(intakePIDF(intakeCurrentVel, intakeVel));
+
+
+
+            reverseRoller.setPower(reverseRollerPower);
+
 
 
             Hood.setPosition(hoodPos);
 
-            Flipper.setPosition(flipperPos);
+//            Flipper.setPosition(flipperPos);
 
             Blocker.setPosition(blockerPos);
 
             intakeFront.setPower(intakeFrontPower);
 
-            intakeBack.setPower(intakeBackPower);
+//            intakeBack.setPower(intakeBackPower);
 
 //            leftRoller.setPower(leftRollerPower);
 //            rightRoller.setPower(rightRollerPower);
@@ -290,13 +309,13 @@ public class ModStarterDebug extends LinearOpMode  {
 
 
 
-            dashboardTelemetry.addData("Flywhel vel", flyCurrentVel);
-            dashboardTelemetry.addData("Flywhel current", Flywheel.getCurrent(CurrentUnit.MILLIAMPS));
-
-            dashboardTelemetry.addData("Current X", pose.x());
-            dashboardTelemetry.addData("Current Y", pose.y());
-            dashboardTelemetry.addData("Current theta", Math.toDegrees(pose.heading()));
-            dashboardTelemetry.addData("distance", dist);
+//            dashboardTelemetry.addData("Flywhel vel", flyCurrentVel);
+//            dashboardTelemetry.addData("Flywhel current", Flywheel.getCurrent(CurrentUnit.MILLIAMPS));
+//
+//            dashboardTelemetry.addData("Current X", pose.x());
+//            dashboardTelemetry.addData("Current Y", pose.y());
+//            dashboardTelemetry.addData("Current theta", Math.toDegrees(pose.heading()));
+//            dashboardTelemetry.addData("distance", dist);
 
 //            mecanumRobotCentricDrive(-gamepad1.right_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
 
@@ -316,9 +335,7 @@ public class ModStarterDebug extends LinearOpMode  {
 
 
             double turn =  mecanumPID(Math.toDegrees(pose.heading()),targetHeadingPIDTest);
-
-            dashboardTelemetry.addData("Turn power", turn);
-//
+            //
 //
 //            if (!drivePID.atSetPoint()){
 //                leftFront.setPower(turn);
@@ -385,6 +402,8 @@ public class ModStarterDebug extends LinearOpMode  {
         Blocker = hardwareMap.get(Servo.class, "Blocker");
         Flipper = hardwareMap.get(Servo.class,"Flipper");
 
+        reverseRoller = hardwareMap.get(CRServo.class,"reverseRoller");
+
 //        leftRoller = hardwareMap.get(CRServo.class, "leftRoller");
 //        rightRoller = hardwareMap.get(CRServo.class,"rightRoller");
 
@@ -417,8 +436,15 @@ public class ModStarterDebug extends LinearOpMode  {
         Flywheel.setDirection(DcMotorSimple.Direction.FORWARD);
         Flywheel.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+        reverseRoller.setDirection(DcMotorSimple.Direction.REVERSE);
+
 //        leftRoller.setDirection(DcMotorSimple.Direction.REVERSE);
 //        rightRoller.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        intakeBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        intakeBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        intakeBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
 
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -445,6 +471,25 @@ public class ModStarterDebug extends LinearOpMode  {
         dashboardTelemetry.addData("Total power", pid+ff);
         dashboardTelemetry.addData("PID", pid);
         dashboardTelemetry.addData("FF", ff);
+
+        return pid + ff;
+    }
+
+    public double intakePIDF(double currentVel, double targetVel){
+
+        if (Math.abs(targetVel) < 20) return 0.0;
+        double velError = targetVel-currentVel;
+        double pid = intakeP * velError;
+        double ff = intakeV * targetVel + Math.signum(velError) * intakeS;
+        dashboardTelemetry.addData("Total power", pid+ff);
+        dashboardTelemetry.addData("PID", pid);
+        dashboardTelemetry.addData("FF", ff);
+        dashboardTelemetry.addData("current Vel intake", currentVel);
+        dashboardTelemetry.addData("target Vel intake", targetVel);
+
+
+
+        dashboardTelemetry.addData("Intake back current", intakeBack.getCurrent(CurrentUnit.MILLIAMPS));
 
         return pid + ff;
     }

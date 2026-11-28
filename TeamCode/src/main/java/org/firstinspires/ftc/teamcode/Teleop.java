@@ -49,6 +49,8 @@ public class Teleop extends LinearOpMode  {
 
     private Servo Hood, Blocker, Flipper;
 
+    private CRServo reverseRoller;
+
 
 
 
@@ -271,6 +273,7 @@ public class Teleop extends LinearOpMode  {
                     {
                       //  intakeBack.setPower(0.5);
                         Blocker.setPosition(rbg.blockOpen);
+                        reverseRoller.setPower(0.8);
                         stoptimers(0,outtake);
                         shooting = true;//
                         intakeBack.setPower(0.7);
@@ -296,6 +299,7 @@ public class Teleop extends LinearOpMode  {
                         driVeable=true;
                         shooting=false;
                         Blocker.setPosition(rbg.blockClose);
+                        reverseRoller.setPower(0);
                     }
 
                     break;
@@ -566,6 +570,9 @@ public class Teleop extends LinearOpMode  {
         leftBack = hardwareMap.get(DcMotorEx.class, "leftBack");
         rightBack = hardwareMap.get(DcMotorEx.class, "rightBack");
         flyWheel = hardwareMap.get(DcMotorEx.class, "Flywheel");
+
+        reverseRoller = hardwareMap.get(CRServo.class,"reverseRoller");
+
         follower = Constants.create(hardwareMap);
 
 //        leftRoller = hardwareMap.get(CRServo.class, "leftRoller");
@@ -599,7 +606,14 @@ public class Teleop extends LinearOpMode  {
         intakeFront.setDirection(DcMotorSimple.Direction.FORWARD);
         intakeBack.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        intakeBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        intakeBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        intakeBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         Flipper.setDirection(Servo.Direction.REVERSE);
+
+        reverseRoller.setDirection(DcMotorSimple.Direction.REVERSE);
+
 
 
 

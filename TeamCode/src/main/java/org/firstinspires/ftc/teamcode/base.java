@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.controller.PIDController;
 import com.seattlesolvers.solverslib.util.InterpLUT;
 
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+
 public class base  {// to save common data and function.
 
     public final double ticksPerDegree =113.7777; // 114.02
@@ -25,6 +27,9 @@ public class base  {// to save common data and function.
     InterpLUT Hoodlut = new InterpLUT();
     double dist = 0;
     public final double flyp = 0.012, flyi=0, flyd = 0, flyv = 0.00036, flys = 0.04;
+
+    public final double intakeP = 0.0006, intakeI= 0, intakeD = 0, intakeV = 0.00038, intakeS = 0.05;
+
 
 
     public final double flipperExtend = 0.56, flipperCollapse = 0.0,flippermid=0.2;
@@ -116,6 +121,17 @@ public class base  {// to save common data and function.
 //        dashboardTelemetry.addData("Total power", pid+ff);
 //        dashboardTelemetry.addData("PID", pid);
 //        dashboardTelemetry.addData("FF", ff);
+
+        return pid + ff;
+    }
+
+    public double intakePIDF(double currentVel, double targetVel){
+
+       if (Math.abs(targetVel) < 20) return 0.0;
+        double velError = targetVel-currentVel;
+        double pid = intakeP * velError;
+        double ff = intakeV * targetVel + Math.signum(velError) * intakeS;
+
 
         return pid + ff;
     }
