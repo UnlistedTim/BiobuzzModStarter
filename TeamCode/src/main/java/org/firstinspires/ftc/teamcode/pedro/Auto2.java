@@ -23,7 +23,7 @@ public class Auto2 extends OpMode {
     private Follower follower;
     private final PoseFactory poseFactory = PoseFactory.degrees();
     private Pose pose,targetPose;
-    private double targetH,flyCurrentVel,dist = 34.21 ,targetflyvel;//35.36
+    private double targetH,flyCurrentVel,dist = 34.21 ,targetflyvel,Ty=0;//35.36
 
 
 
@@ -80,7 +80,7 @@ public class Auto2 extends OpMode {
     //  private double startX = -16.01 , startY = -60.89,startHeading=-90;
 
     public boolean recevieinfo=false,colorRed=true,configured=false,update=true,complete=false;
-    public boolean flagmiss=false;
+    public boolean flagmiss=false,flagstarttarget=true;
 
    // public  Pose startPose = poseFactory.of(startX,startY,-90);
    public  Pose startPose ;
@@ -165,13 +165,13 @@ public class Auto2 extends OpMode {
 
         return Paths.path(shootHflowerLtranred,flowerLtranparkred);
     }
-    private Path shootLparkred(){
+    private Path pathshootLparkred(){
         return Paths.curve( shootLred, parkctlred,parkred).constant(Math.toRadians(-90));
-        // return line()
+
     }
-    private Path shootHparkblue(){
+    private Path pathshootHparkblue(){
         return Paths.curve(shootHblue, parkctlblue,parkblue).constant(Math.toRadians(90));
-        // return line()
+
     }
 
 //blue
@@ -494,8 +494,10 @@ public class Auto2 extends OpMode {
               if(limedetect(limeindex)) pathState=11;
               else
               { dist= 31.78;
-                pathState=13;
+                pathState=12;
               }
+
+
                break;
 
             case 11:
@@ -508,7 +510,12 @@ public class Auto2 extends OpMode {
                 }
                 break;
             case 12:
-                if(!limedetect(limeindex)||rbga.timer(1500)) pathState=13;
+                if(!limedetect(limeindex)||rbga.timer(1500)) {
+                    pathState=13;
+                    if(colorRed) limeindex=2;else limeindex=4;
+                    Limelight.pipelineSwitch(limeindex);
+                    Limelight.start();
+                }
                 break;
 
 
@@ -568,8 +575,10 @@ public class Auto2 extends OpMode {
                 //tbd;
                 pathState=45;
                 }
-                break;
-            case 45:
+                if(colorRed) limeindex=1; else limeindex=3;
+                Limelight.pipelineSwitch(limeindex);
+                Limelight.start();
+                break;            case 45:
                 if(!follower.isBusy()) {
                     pathState = 50;
                 }
@@ -589,10 +598,15 @@ public class Auto2 extends OpMode {
 
             case 60:
                 if(shoot()) {
-                    if(colorRed)
+                    if(colorRed) {
                         follower.follow(pathflowerHflowerLred());
-                    else
+                        limeindex=1;
+
+                    }
+                    else {
                         follower.follow(pathflowerLflowerHblue());
+                        limeindex=3;
+                    }
                     Flipper.setPosition(rbga.flippermid);
                     pathState = 62;
                 }
@@ -630,17 +644,17 @@ public class Auto2 extends OpMode {
 
             case 70:
                 if(rbga.timer(2000)) {
-                    limeindex=1;
-                if(limedetect(limeindex)) pathState=72;
-                else pathState=75;
+
+                if(limedetect(limeindex)&&Ty>-5) {pathState=72;flagstarttarget=true;}//redL tip high.
+                else {pathState=75;flagstarttarget=false;}
 
                 }
                 break;
             case 72:
 
-
                     if(colorRed)
                         follower.follow(pathflowerLshootLred());
+
                     else
                         follower.follow(pathflowerHshootLblue());
 
@@ -681,15 +695,23 @@ public class Auto2 extends OpMode {
 
             case 85:
                 if(shoot()) {
-
                     update = false;
                     flyWheel.setPower(0);
                     intakeBack.setPower(0);
                     intakeFront.setPower(0);
-                    if(colorRed)
-                        follower.follow(pathshootHparkred());
-                    else
-                        follower.follow(pathshootLparkblue());
+                    if(colorRed) {
+                        if (flagstarttarget)
+                            follower.follow(pathshootLparkred());
+                        else
+                            follower.follow(pathshootHparkred());
+                    }
+                    else {
+                        if (flagstarttarget)
+                            follower.follow(pathshootHparkblue());
+                        else
+
+                            follower.follow(pathshootLparkblue());
+                    }
                     pathState = 90;
 
 
@@ -710,7 +732,7 @@ public class Auto2 extends OpMode {
                 break;
 
             case 100:
-                if(rbga.timer(600)) {
+                if(rbga.timer(500)) {
                     autosave();
                     pathState = 200;
                 }
@@ -727,8 +749,14 @@ public class Auto2 extends OpMode {
 
 
     {
+
         result= Limelight.getLatestResult();
-       return(result.isValid());
+
+        if(result.isValid())
+        {Ty=result.getTy();return true;}
+
+        return false;
+
 
     }
 

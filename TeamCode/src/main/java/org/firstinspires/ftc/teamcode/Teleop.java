@@ -217,8 +217,7 @@ public class Teleop extends LinearOpMode  {
                     flyWheel.setPower(0.4);
                     intakeFront.setPower(0.9);
                     intakeBack.setPower(0.7);
-//                    leftRoller.setPower(0.9);
-//                    rightRoller.setPower(0.9);
+
                     intakestep=0;
                     state = State.INTAKE;
                     break;
@@ -269,7 +268,7 @@ public class Teleop extends LinearOpMode  {
 
                 case OUTTAKE:
 
-                    if ( !shooting && (Math.abs(flyCurrentVel - targetFlyVel) <40||stoptimers(2000,outtake)))
+                    if ( !shooting && (Math.abs(flyCurrentVel - targetFlyVel) <40))
                     {
                       //  intakeBack.setPower(0.5);
                         Blocker.setPosition(rbg.blockOpen);
@@ -277,23 +276,11 @@ public class Teleop extends LinearOpMode  {
                         stoptimers(0,outtake);
                         shooting = true;//
                         intakeBack.setPower(0.7);
+                        intakeFront.setPower(0.9);
                     }
-                     if(shooting) {
-                         if(gamepad1.left_bumper&&!reversing) {
-                             stoptimers(0,reverse);
-                             reversing=true;
-                             intakeBack.setPower(-0.8);
-                         }
-                         if(reversing&&stoptimers(600,reverse)) {
-                             intakeBack.setPower(0.7);
-                             reversing=false;
-                         }
 
 
-
-                     }
-
-                    if(shooting&&(Math.abs(gamepad1.right_stick_y)>0.18 || Math.abs(gamepad1.right_stick_x) > 0.18)) {
+                    if(shooting&&(Math.abs(gamepad1.right_stick_y)>0.15 || Math.abs(gamepad1.right_stick_x) > 0.15)) {
                         outtakePhase=false;
                         state=State.IDLE;
                         driVeable=true;
@@ -575,8 +562,6 @@ public class Teleop extends LinearOpMode  {
 
         follower = Constants.create(hardwareMap);
 
-//        leftRoller = hardwareMap.get(CRServo.class, "leftRoller");
-//        rightRoller = hardwareMap.get(CRServo.class,"rightRoller");
 
         Hood = hardwareMap.get(Servo.class, "Hood");
         Blocker = hardwareMap.get(Servo.class, "Blocker");
