@@ -93,7 +93,7 @@ public class Teleop extends LinearOpMode  {
 
     public Follower follower;
 
-    public double flyCurrentVel = 0, targetFlyVel = 0;
+    public double flyCurrentVel = 0, targetFlyVel = 0,intaketarvel=1800,intakecurrentvel;
     public boolean outtakePhase=false,timer=false,aligNing=false,driVeable=true, intakeTimer = false, outtakeTimer = false;
     private boolean flipperFlag=false,recevieinfo=false,intakejam=false,shooting=false,reversing=false;
 
@@ -239,6 +239,8 @@ public class Teleop extends LinearOpMode  {
                         driVeable = false;
                         outtakePhase=true;
                         stoptimers(0,align);
+                        intakeBack.setPower(0);
+                        intakeFront.setPower(0);
                     }
 
 //                    if(gamepad1.left_bumper){
@@ -255,7 +257,7 @@ public class Teleop extends LinearOpMode  {
                     if(align()||stoptimers(2000,align)) {
 
                            state=State.OUTTAKE;
-                           intakeBack.setPower(-0.7);
+                          // intakeBack.setPower(-0.7);
                       //  stoptimers(0,outtake);
 
                         }
@@ -275,8 +277,8 @@ public class Teleop extends LinearOpMode  {
                         reverseRoller.setPower(0.8);
                         stoptimers(0,outtake);
                         shooting = true;//
-                        intakeBack.setPower(0.7);
-                        intakeFront.setPower(0.9);
+//                        intakeBack.setPower(0.7);
+                      intakeFront.setPower(0.9);
                     }
 
 
@@ -345,9 +347,9 @@ public class Teleop extends LinearOpMode  {
         dist = pose.distance(targetPose)-5.4;
         Hood.setPosition(rbg.flyHood(dist));
         targetFlyVel = rbg.flySpeed(dist);
+        intakecurrentvel=intakeBack.getVelocity();
+        if(shooting) intakeBack.setPower(rbg.intakePIDF(intakecurrentvel,intaketarvel));
         flyWheel.setPower(rbg.flyPIDF(flyCurrentVel,targetFlyVel));
-
-
 
     }
 
@@ -712,6 +714,8 @@ public class Teleop extends LinearOpMode  {
 
         //  telemetry.update();
     }
+
+
 
     public void mecanumRobotDrive(double y, double x, double rx){
 
