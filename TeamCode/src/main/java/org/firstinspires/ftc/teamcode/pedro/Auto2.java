@@ -25,7 +25,7 @@ public class Auto2 extends OpMode {
     private final PoseFactory poseFactory = PoseFactory.degrees();
     private Pose pose,targetPose;
     private double targetH,flyCurrentVel,dist = 34.21 ,targetflyvel,Ty=0;//35.36
-    private double intaketarvel, intakecurvel;
+    private double intaketarvel = 1800, intakecurvel;
 
     private CRServo reverseRoller;
 
@@ -400,19 +400,27 @@ public class Auto2 extends OpMode {
 
     boolean shoot(){
 
-       if(shootstep==0 &&(Math.abs(flyCurrentVel - targetflyvel)<40)) {
+        if (shootstep == 0){
+            intakeBack.setPower(rbga.intakePIDF(intakecurvel, intaketarvel));
+            intakeFront.setPower(0.9);
+            shootstep = 1;
+
+        }
+
+       if(shootstep==1 &&(Math.abs(flyCurrentVel - targetflyvel)<40)) {
 
            Blocker.setPosition(rbga.blockOpen);
           reverseRoller.setPower(0.8);
-           shootstep=1;
+           shootstep=2;
            rbga.timer(0);
-           intakeFront.setPower(0.9);
+
 
 
        }
 
-     if(shootstep==1) {
-         intakeBack.setPower(rbga.intakePIDF(intakecurvel, intaketarvel));
+     if(shootstep==2) {
+
+
          if (rbga.timer(1600)) {
              Blocker.setPosition(rbga.blockClose);
              intakeFront.setPower(0);
@@ -523,12 +531,14 @@ public class Auto2 extends OpMode {
                 break;
 
             case 10:
-              if(limedetect(limeindex)) pathState=11;
-              else
-              { dist= 31.78;
-                pathState=12;
-              }
 
+                if (!follower.isBusy()){
+                    if(limedetect(limeindex)) pathState=11;
+                    else
+                    { dist= 31.78;
+                        pathState=12;
+                    }
+                }
 
                break;
 
@@ -555,13 +565,11 @@ public class Auto2 extends OpMode {
 
             case 13:
 
-                    if(colorRed) follower.follow(pathshootLshootHred());
-                    else follower.follow(pathshootHshootLblue());
+                if(colorRed) follower.follow(pathshootLshootHred());
+                else follower.follow(pathshootHshootLblue());
 
 
                 break;
-
-
 
 
             case 15:
@@ -792,7 +800,8 @@ public class Auto2 extends OpMode {
         result= Limelight.getLatestResult();
 
         if(result.isValid())
-        {Ty=result.getTy();return true;}
+        {Ty=result.getTy();
+            return true;}
 
         return false;
 

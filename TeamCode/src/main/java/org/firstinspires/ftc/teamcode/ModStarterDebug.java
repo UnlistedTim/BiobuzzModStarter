@@ -167,7 +167,7 @@ public class ModStarterDebug extends LinearOpMode  {
 
     public static double blockerPos = 0.27; //0.27 up 0.63 collapse
 
-    public static double flipperPos = 0.45; //0.75 up // 0.4 or 0.35 down
+    public static double flipperPos = 0.4; //0.75 up // 0.4 or 0.35 down
 
     public static double reverseRollerPower = 0.0;
 
@@ -292,7 +292,7 @@ public class ModStarterDebug extends LinearOpMode  {
 
             Hood.setPosition(hoodPos);
 
-//            Flipper.setPosition(flipperPos);
+            Flipper.setPosition(flipperPos);
 
             Blocker.setPosition(blockerPos);
 
@@ -332,6 +332,12 @@ public class ModStarterDebug extends LinearOpMode  {
                 Tx=1000;
                 Ty=1000;
             }
+
+
+            telemetry.addData("Limelight see?", result.isValid());
+            telemetry.addData("Tx", Tx);
+            telemetry.addData("Ty", Ty);
+            telemetry.update();
 
 
             double turn =  mecanumPID(Math.toDegrees(pose.heading()),targetHeadingPIDTest);

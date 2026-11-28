@@ -32,9 +32,9 @@ public class base  {// to save common data and function.
 
 
 
-    public final double flipperExtend = 0.56, flipperCollapse = 0.0,flippermid=0.2;
+    public final double flipperExtend = 0.77, flipperCollapse = 0.4,flippermid=0.5;
 
-   public final double blockClose = 0.5, blockOpen = 0.22;
+   public final double blockClose = 0.5, blockOpen = 0.18;
 
 
     public static final double  startX1 = -16.01 , startY1=-62.3,starH1=-90;// = -55.49;
